@@ -24,7 +24,6 @@
                 <div class="field">
                   <label class="label">Lieu</label>
                   <div class="control">
-                    <!-- <input class="input" type="text" placeholder="Votre adresse" v-bind:value="addresse" required/> -->
                     <input
                       class="input"
                       type="text"

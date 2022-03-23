@@ -222,4 +222,90 @@ class EventController
         }
         return $resp;
     }
+
+    //Delete tous les évènement expirés 
+    public function deleteEventsExpired(Request $req, Response $resp, array $args): Response
+    {
+        $listIdEvents = Event::select(['id'])->get();
+
+        $body = [
+            'lenght' => 0,
+            'events' => []
+        ];
+
+        foreach ($listIdEvents as $idEvent) {
+            $event = Event::find($idEvent->id);
+
+            $date_now = new  DateTime();
+            $date_6months = date('Y-m-d H:i:s', strtotime("+6 months", strtotime($event['dateEvent'])));
+            $date_convert = new DateTime($date_6months);
+
+
+            $diff = date_diff($date_now, $date_convert)->format('%R');
+            if ($diff == '-') {
+                $event->delete();
+                $res = "event deleted";
+            } else
+                $res = "can't delete event, not expired yet";
+
+
+            $response =  [
+                'status' => $res,
+                'event'  => $event
+            ];
+            array_push($body['events'], $response);
+        }
+
+        $resp->getBody()->write(json_encode($body));
+        return writer::json_output($resp, 200);
+    }
+
+
+    //get Events By idCreator
+    public function getEventByIdCreator(Request $req, Response $resp, array $args): Response
+    {
+        $id_creator = $args['id'] ?? null;
+        try {
+            $event = Event::select(['id', 'titre', 'description', 'idCreateur', 'dateEvent', 'lieu', 'created_at'])
+                ->where('idCreateur', '=', $id_creator)->get();
+
+                $datas_resp = [
+                "type" => "event",
+                "event" => $event,
+                "idCreateur" => $id_creator,
+            ];
+
+            $resp->getBody()->write(json_encode($datas_resp));
+            return writer::json_output($resp, 200);
+        } catch (ModelNotFoundException $e) {
+            return Writer::json_error($resp, 404, "Event not found");
+        }
+    }
+
+
+    public function deleteEventById(Request $req, Response $resp, array $args): Response
+    {
+        $id_event = $args['id'] ?? null;
+        try {
+            $event = Event::findOrFail($id_event);
+            if( $event->delete()){
+                $datas_resp = [
+                    "type" => "event",
+                    "event" => $event,
+                    "response" => "event deleted",
+                ];
+            }else{
+                $datas_resp = [
+                    "type" => "event",
+                    "event" => $event,
+                    "response" => "event couldn't be deleted"
+                ];
+            }
+            $resp->getBody()->write(json_encode($datas_resp));
+            return writer::json_output($resp, 200);
+        } catch (ModelNotFoundException $e) {
+            return Writer::json_error($resp, 404, "Event not found");
+        }
+    }
+
 }
