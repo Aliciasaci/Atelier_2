@@ -28,25 +28,34 @@ class backofficeController
             'timeout' => 5.0
         ]);
 
-        //$headers = ['Authorization' => explode(" ", $rq->getHeader('Authorization')[0])[1]];
-        $response = $client->delete('/events', /*[
-            'headers' => ['Authorization' => $req->getHeader('Authorization')]
-        ]*/);
+        $response = $client->delete('/events');
 
         $resp->getBody()->write($response->getBody());
         return writer::json_output($resp, $response->getStatusCode());
     }
 
+    
     public function deleteUser(Request $req, Response $resp, array $args): Response{
         $client = new \GuzzleHttp\Client([
             'base_uri' => $this->c->get('settings')['auth_service'],
             'timeout' => 5.0
         ]);
 
-        //$headers = ['Authorization' => explode(" ", $rq->getHeader('Authorization')[0])[1]];
-        $response = $client->delete('/users', /*[
-            'headers' => ['Authorization' => $req->getHeader('Authorization')]
-        ]*/);
+        $response = $client->delete('/users');
+
+        $resp->getBody()->write($response->getBody());
+        return writer::json_output($resp, $response->getStatusCode());
+    }
+
+
+    public function auth(Request $req, Response $resp, array $args): Response{
+        
+        $client = new \GuzzleHttp\Client([
+            'base_uri' => $this->c->get('settings')['auth_service'],
+            'timeout' => 5.0
+        ]);
+
+        $response = $client->post('/auth');
 
         $resp->getBody()->write($response->getBody());
         return writer::json_output($resp, $response->getStatusCode());

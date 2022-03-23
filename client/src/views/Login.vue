@@ -7,11 +7,11 @@
             <h1 class="title is-2 ">Reunionou</h1>
             <div class="box">
               <h4 class="title is-4 has-text-centered se-connecter"><b>Se connecter</b></h4>
-
+            <form @submit.prevent="login">
               <div class="field">
                 <label class="label">Email</label>
                 <div>
-                  <input class="input is-small" type="email" placeholder="Veuillez saisir votre @mail"/>
+                  <input class="input is-small" type="email" v-model="email" placeholder="Veuillez saisir votre @mail"/>
                 </div>
                 <!-- <p class="help is-danger">This email is invalid</p> -->
               </div>
@@ -19,7 +19,7 @@
               <div class="field">
                 <label class="label">Password</label>
                 <div>
-                  <input class="input is-small" type="text"
+                  <input class="input is-small" type="text" v-model="password"
                     placeholder="Veuillez saisir votre mot de passe" />
                 </div>
                 <!-- <p class="help is-danger">This Password is available</p> -->
@@ -27,9 +27,10 @@
               
               <div class="field is-grouped">
                 <div class="control">
-                  <router-link  class="button is-link is-normal" to="/Accueil">valider</router-link > 
+                  <button  class="button is-link is-normal" >valider</button>
                 </div>
               </div>
+              </form>
             </div>
             <div class="box"> Pas encore inscrit ? <router-link class="is-text" to="/SingnIn">S'inscrire</router-link > 
             </div>
@@ -40,10 +41,33 @@
   </section>
 </template>
 <script>
+import axios from "axios";
+import Buffer from "buffer";
 export default {
   mounted() {},
-  data() {},
-  methods: {},
+  data() {
+    return{
+      email : "alicia@gmail.com",
+      password : "password",
+      credentials : null,
+    }
+  },
+  methods: {
+    login(){
+      this.credentials =  btoa(`${this.email},${this.password}`);
+      console.log(this.credentials);
+      axios
+              .post("http://api.backoffice.local/auth", {
+                header: {'Authorization': 'Basic'+this.credentials},
+              })
+              .then((response) => {
+               console.log(response);
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+          }
+  },
 };
 </script>
 <style lang="scss">

@@ -10,5 +10,4 @@ $app->delete('/events[/]',BackofficeController::class. ':deleteEvent')->setName(
 
 $app->delete('/users[/]',BackofficeController::class. ':deleteUser')->setName('deleteUser')->add(Middleware::class.':putIntoJson');
 
-//!combien garder l'evenement actif ? 6mois  
-//!combien garder l'utilisateur actif ? last-connected 
+$app->get('/auth[/]',BackofficeController::class. ':auth')->setName('auth')->add(Middleware::class.':putIntoJson');
