@@ -28,7 +28,7 @@ class REUAuthController //extends Controller
     }
 
     public function authenticate(Request $rq, Response $rs, array $args): Response {
-
+       
         if (!$rq->hasHeader('Authorization')) {
 
             $rs = $rs->withHeader('WWW-authenticate', 'Basic realm="users_api api" ');
@@ -39,11 +39,12 @@ class REUAuthController //extends Controller
         list($email, $pass) = explode(':', $authstring);
 
         try {
-            $user = User::select('id', 'username', 'email', 'password', 'refresh_token', 'created_at', 'description')
+            $user = User::select('id', 'username', 'email', 'password', 'refresh_token', 'created_at', 'description','updated_at')
                 ->where('email', '=', $email)
                 ->firstOrFail();
 
-            if (!password_verify($pass, $user->password))
+          
+           if (($pass != $user->password))
                 throw new \Exception("password check failed");
 
             unset ($user->password);
@@ -55,9 +56,6 @@ class REUAuthController //extends Controller
             $rs = $rs->withHeader('WWW-authenticate', 'Basic realm="reu authentification" ');
             return Writer::json_error($rs, 401, $e->getMessage());
         }
-
-        $user->last_connected = new DateTime();
-        $user->save();
 
         $secret = $this->container->settings['secret'];
         $token = JWT::encode(['iss' => 'http://api.authentification.local/auth',
@@ -73,7 +71,7 @@ class REUAuthController //extends Controller
         $user->refresh_token = bin2hex(random_bytes(32));
         $user->save();
         $data = [
-            'access-token' => $token,
+            'access-token' =>  $token,
             'refresh-token' => $user->refresh_token
         ];
 
@@ -105,7 +103,6 @@ class REUAuthController //extends Controller
                "message" => $errors
             ]);
    
-            $rs = $rs->withHeader('Content-Type', 'application/json;charset=utf-8');
             $rs->getBody()->write($body);
             return $rs;
          } else {
@@ -149,7 +146,6 @@ class REUAuthController //extends Controller
                   "message" => "Une erreur est survenu lors de la création du compte, réessayer ultérieurement !"
                ]);
             }
-            $rs = $rs->withHeader('Content-Type', 'application/json;charset=utf-8');
             $rs->getBody()->write($body);
          } 
       return $resp;
@@ -170,8 +166,9 @@ class REUAuthController //extends Controller
             
             $resp = $resp->withStatus(201);
             $body = json_encode([
-                "lenght" => count($json),
+                "lenghth" => count($json),
                 "users" => $json,
+                "response" => "the users have been deleted",
             ]);
         }catch(ModelNotFoundException $e) {
             $rs = $resp->withStatus(404);

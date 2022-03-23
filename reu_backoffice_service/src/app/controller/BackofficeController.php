@@ -22,7 +22,8 @@ class backofficeController
         $this->c = $c;
     }
 
-    public function deleteEvent(Request $req, Response $resp, array $args): Response {
+    public function deleteEvent(Request $req, Response $resp, array $args): Response
+    {
         $client = new \GuzzleHttp\Client([
             'base_uri' => $this->c->get('settings')['events_service'],
             'timeout' => 5.0
@@ -34,8 +35,9 @@ class backofficeController
         return writer::json_output($resp, $response->getStatusCode());
     }
 
-    
-    public function deleteUser(Request $req, Response $resp, array $args): Response{
+
+    public function deleteUser(Request $req, Response $resp, array $args): Response
+    {
         $client = new \GuzzleHttp\Client([
             'base_uri' => $this->c->get('settings')['auth_service'],
             'timeout' => 5.0
@@ -48,16 +50,25 @@ class backofficeController
     }
 
 
-    public function auth(Request $req, Response $resp, array $args): Response{
-        
+    public function auth(Request $req, Response $resp, array $args): Response
+    {
         $client = new \GuzzleHttp\Client([
             'base_uri' => $this->c->get('settings')['auth_service'],
             'timeout' => 5.0
         ]);
 
-        $response = $client->post('/auth');
+        if (!$req->hasHeader('Authorization')) {
 
-        $resp->getBody()->write($response->getBody());
-        return writer::json_output($resp, $response->getStatusCode());
+            $resp = $resp->withHeader('WWW-authenticate', 'Basic realm="users_api api" ');
+            return Writer::json_error($resp, 401, 'No Authorization header present');
+        } else {
+            $response = $client->request('POST', '/auth', [
+                'headers' => ['Authorization' => $req->getHeader('Authorization')]
+            ]);
+
+            $resp = $resp->withStatus($response->getStatusCode())->withHeader('Content-Type', $response->getHeader('Content-Type'))
+                ->withBody($response->getBody());
+            return $resp;
+        }
     }
 }

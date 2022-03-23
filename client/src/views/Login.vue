@@ -58,7 +58,7 @@ export default {
       console.log(this.credentials);
       axios
               .post("http://api.backoffice.local/auth", {
-                header: {'Authorization': 'Basic'+this.credentials},
+                header: {'Authorization': 'Basic ' + this.credentials},
               })
               .then((response) => {
                console.log(response);

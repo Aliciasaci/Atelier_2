@@ -6,8 +6,7 @@ use \DavidePastore\Slim\Validation\Validation as Validation;
 
 $validators = Middleware::user_validators();
 
-$app->post('/auth[/]',REUAuthController::class.':authenticate')
-    ->setName('Auth');
+$app->post('/auth[/]',REUAuthController::class.':authenticate')->setName('authenticate')->add(middleware::class.':putIntoJson');
 
 $app->post('/createUser[/]',REUAuthController::class.':create')
     ->setName('createUser')
