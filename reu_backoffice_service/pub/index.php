@@ -1,7 +1,7 @@
 <?php
 require_once  __DIR__ . '/../src/vendor/autoload.php';
 use reu\backoffice\app\bootstrap\ReuBootstrap;
-
+use reu\backoffice\app\middleware\Middleware;
 $config = require_once __DIR__ . '/../src/app/conf/settings.php';
 $dependencies = require_once __DIR__ . '/../src/app/conf/dependencies.php';
 $errors = require_once __DIR__ . '/../src/app/conf/errors.php';
@@ -14,12 +14,12 @@ $app = new \Slim\App($c);
 
 ReuBootstrap::startEloquent($c->settings['dbfile']);
 
-
-
-//Les routes de l'application
 require_once __DIR__ . '/../src/app/routes/routes.php';
 
-
+$app->add(Middleware::class. ':corsHeaders');
+$app->options('/{routes:.+}', function ($request, $response, $args) {
+    return $response;
+});
 $app->run();
 
 

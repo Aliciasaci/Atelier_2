@@ -13,7 +13,7 @@
                 <div>
                   <input class="input is-small" type="email" v-model="email" placeholder="Veuillez saisir votre @mail"/>
                 </div>
-                <!-- <p class="help is-danger">This email is invalid</p> -->
+                <p v-if="responseMessage" class="help is-danger">{{responseMessage}}</p>
               </div>
               
               <div class="field">
@@ -22,7 +22,7 @@
                   <input class="input is-small" type="text" v-model="password"
                     placeholder="Veuillez saisir votre mot de passe" />
                 </div>
-                <!-- <p class="help is-danger">This Password is available</p> -->
+                <p v-if="responseMessage" class="help is-danger">{{responseMessage}}</p>
               </div>
               
               <div class="field is-grouped">
@@ -42,29 +42,35 @@
 </template>
 <script>
 import axios from "axios";
-import Buffer from "buffer";
 export default {
   mounted() {},
   data() {
     return{
-      email : "alicia@gmail.com",
-      password : "password",
-      credentials : null,
+      email : "",
+      password : "",
+      responseMessage : "",
     }
   },
   methods: {
     login(){
-      this.credentials =  btoa(`${this.email},${this.password}`);
-      console.log(this.credentials);
-      axios
-              .post("http://api.backoffice.local/auth", {
-                header: {'Authorization': 'Basic ' + this.credentials},
-              })
+      this.$api
+              .post("auth",
+                    {},
+                    {
+                        auth: {
+                            username: this.email,
+                            password: this.password,
+                        },
+                    }
+              )
               .then((response) => {
                console.log(response);
+                this.$store.commit("setToken", response.data.token);
+                this.$router.push("Accueil");
               })
               .catch((error) => {
                 console.log(error);
+                this.responseMessage = "Email ou mots de passe incorrecte";
               });
           }
   },

@@ -11,3 +11,7 @@ $app->post('/events[/]',BackofficeController::class. ':deleteEvent')->setName('d
 $app->post('/users[/]',BackofficeController::class. ':deleteUser')->setName('deleteUser')->add(Middleware::class.':putIntoJson');
 
 $app->post('/auth[/]',BackofficeController::class. ':auth')->setName('auth')->add(Middleware::class.':putIntoJson');
+
+$app->post('/signin[/]',BackofficeController::class. ':signIn')->setName('signIn')->add(Middleware::class.':putIntoJson');
+
+$app->get('/events/creators/{id}[/]',BackofficeController::class. ':getEvent')->setName('getEvent')->add(Middleware::class.':putIntoJson');

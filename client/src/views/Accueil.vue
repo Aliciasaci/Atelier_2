@@ -110,7 +110,28 @@ export default {
   data() {
     return {};
   },
-  mounted(){
+  mounted :{
+    getEventsByUser(){
+        this.$api
+              .post("auth",
+                    {},
+                    {
+                        auth: {
+                            username: this.email,
+                            password: this.password,
+                        },
+                    }
+              )
+              .then((response) => {
+               console.log(response);
+                this.$store.commit("setToken", response.data.token);
+                this.$router.push("Accueil");
+              })
+              .catch((error) => {
+                console.log(error);
+                this.responseMessage = "Email ou mots de passe incorrecte";
+              });
+          }
   },
   methods: {},
 };
