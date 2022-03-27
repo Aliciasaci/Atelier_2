@@ -1,9 +1,6 @@
 <?php
 namespace reu\authentification\app\middlewares;
 use \Respect\Validation\Validator as V;
-use reu\authentification\app\utils\Writer;
-use \Psr\Http\Message\ServerRequestInterface as Request;
-use \Psr\Http\Message\ResponseInterface as Response;
 
 class Middleware{
 

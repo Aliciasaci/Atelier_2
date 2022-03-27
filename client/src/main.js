@@ -8,6 +8,16 @@ import axios from "axios";
 
 Vue.prototype.$api = new axios.create({
     baseURL: "http://api.backoffice.local:62364/",
+    params: {},
+    headers: {}
+});
+
+Vue.prototype.$api.interceptors.request.use(function(config) {
+    if (store.state.token) {
+        // config.headers.Authorization = store.state.token
+        config.headers.Authorization = `Bearer ${store.state.token}`
+    }
+    return config;
 });
 
 Vue.config.productionTip = false

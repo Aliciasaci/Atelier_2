@@ -2,7 +2,7 @@ export const Outils = {
     methods: {
         avatar(member) {
             return `https://eu.ui-avatars.com/api/?name=${
-        member.fullname
+        member.username
       }&rounded=true&bold=true&format=svg&background=${this.stringToColour(
         member.email
       )}`;

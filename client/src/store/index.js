@@ -12,9 +12,9 @@ export default new Vuex.Store({
     plugins: [vuexLocal.plugin],
     state: {
         ready: false,
-        token: '',
+        token: "",
         member: false,
-        members: [],
+        invitations: [],
     },
     getters: {},
     mutations: {
@@ -23,10 +23,14 @@ export default new Vuex.Store({
         },
         setToken(state, token) {
             state.token = token;
+            console.log(state.token);
         },
         setMember(state, member) {
             state.member = member;
         },
+        setInvitations(state, invitations) {
+            state.invitations = invitations;
+        }
     },
     actions: {},
     modules: {}

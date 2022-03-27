@@ -14,6 +14,7 @@ use reu\authentification\app\models\User;
 use reu\authentification\app\utils\Writer;
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
+use Ramsey\Uuid\Uuid;
 
 /**
  * Class REUAuthController
@@ -53,7 +54,7 @@ class REUAuthController //extends Controller
             unset($user->password);
         } catch (ModelNotFoundException $e) {
             $rs = $rs->withHeader('WWW-authenticate', 'Basic realm="reu authentification" ');
-            return Writer::json_error($rs, 401, 'Erreur authentification');
+            return Writer::json_error($rs, 401, 'Cet utilisateur n\'existe pas');
         } catch (\Exception $e) {
             $rs = $rs->withHeader('WWW-authenticate', 'Basic realm="reu authentification" ');
             return Writer::json_error($rs, 401, $e->getMessage());
@@ -65,8 +66,9 @@ class REUAuthController //extends Controller
                 'iss' => 'http://api.authentification.local/auth',
                 'aud' => 'http://api.backoffice.local',
                 'iat' => time(),
-                'exp' => time() + (12 * 30 * 24 * 3600),
+                'exp' => time() + (12 * 30 * 24),  //validité 30 jours
                 'upr' => [
+                    'user_id' => $user->id,
                     'email' => $user->email,
                     'username' => $user->username,
                 ]
@@ -123,8 +125,7 @@ class REUAuthController //extends Controller
                 $email = filter_var($data["mail"], FILTER_SANITIZE_EMAIL);
                 $pwd = htmlspecialchars($data["pwd"], ENT_QUOTES);
 
-                $id = random_bytes(36);
-                $id = bin2hex($id);
+                $id = Uuid::uuid4();
 
                 $user = new User();
                 $user->id = $id;

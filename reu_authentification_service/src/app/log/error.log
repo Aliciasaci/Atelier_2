@@ -7,3 +7,6 @@
 [2022-03-24T15:42:22.344850+00:00] lbs.log.ERROR: error | 500 | Cannot use object of type Slim\Http\RequestBody as array | /var/www/src/app/controller/REUAuthController.phpline: 116 [] []
 [2022-03-24T15:44:05.637769+00:00] lbs.log.ERROR: error | 500 | Cannot use object of type Slim\Http\RequestBody as array | /var/www/src/app/controller/REUAuthController.phpline: 116 [] []
 [2022-03-24T16:08:05.772516+00:00] lbs.log.ERROR: error | 500 | Return value of reu\authentification\app\controller\REUAuthController::create() must implement interface Psr\Http\Message\ResponseInterface, none returned | /var/www/src/app/controller/REUAuthController.phpline: 187 [] []
+[2022-03-25T13:46:15.194626+00:00] lbs.log.ERROR: GET http://api.authentification.local/createparticipant : malformed uri [] []
+[2022-03-25T14:58:18.715889+00:00] lbs.log.ERROR: GET http://api.authentification.local/events/a95144d2-1a31-458f-8665-35f571105664participsations/ : malformed uri [] []
+[2022-03-25T14:58:52.191456+00:00] lbs.log.ERROR: GET http://api.authentification.local/events/a95144d2-1a31-458f-8665-35f571105664/participsations/ : malformed uri [] []

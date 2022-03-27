@@ -25,7 +25,7 @@
               <div class="field">
                 <label class="label">Password</label>
                 <div>
-                  <input v-model="pwd" class="input is-small " type="text" placeholder="Veuillez saisir votre mot de passe" required />
+                  <input v-model="pwd" class="input is-small " type="password" placeholder="Veuillez saisir votre mot de passe" required />
                 </div>
               </div>
               
@@ -62,11 +62,10 @@ export default {
           mail: this.mail,
           pwd: this.pwd,
     }).then(response => {
-      console.log(response);
       if(response.status == 200){
-        this.responseMessage = "Votre compte a été crée avec succès. Vous pouvez à présent vous connecter"
+        this.responseMessage = "Votre compte a été crée avec succès."
       }else{
-        this.responseMessage = "une erreur est parvenue lors de la création de votre compte"
+        this.responseMessage = "une erreur est parvenue lors de la création de votre compte."
       }
     })
   },

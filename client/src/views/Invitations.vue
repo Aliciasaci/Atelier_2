@@ -5,79 +5,25 @@
       <div class="container">
         <div class="columns is-centered">
           <div class="column is-6-tablet is-5-desktop is-6-widescreen">
-            <h4 class="title is-5 has-text-centered mb-20">
-              Mes Invitations
-            </h4>
-            <div class="card mb-5">
+            <h4 class="title is-5 has-text-centered mb-20">Mes Invitations</h4>
+            <div class="card mb-5" v-for="event in events" :key="event.id">
               <div class="card-content">
-                <div class="content">
-                  Lorem ipsum leo risus, porta ac consectetur ac, vestibulum at
-                  eros. Donec id elit non mi porta gravida at eget metus. Cum
-                  sociis natoque penatibus et magnis dis parturient montes,
-                  nascetur ridiculus mus. Cras mattis consectetur purus sit amet
-                  fermentum.
-                </div>
+                <p class="title title-event event is-5">{{ event.titre }}</p>
+                <p class="content">{{ event.description }}</p>
+                <p class="subtitle event is-6">
+                  <b>Organisateur :</b>
+                </p>
+                <p class="subtitle event is-6">
+                  <b>Adresse :</b>
+                  {{ event.lieu }}<br/>
+                  <b>Le : </b>
+                  <time datetime="2016-1-1">{{ event.dateEvent }}</time>
+                </p>
               </div>
               <div class="card">
                 <footer class="card-footer">
-                   <router-link to="/DetailEvent" class="button is-black is-light btn-footer">
-                    Consulter
-                  </router-link>
-                  <button class="button is-success is-light btn-footer">
-                    Accepter
-                  </button>
-                   <button class="button is-danger is-light btn-footer">
-                    Refuser
-                  </button>
+                  <router-link :to="{name:'DetailEvent' ,params:{id: event.id}}" class="button is-info is-light btn-footer">Consulter</router-link>
                 </footer>
-              </div>
-            </div>
-            <div class="card mb-5">
-              <div class="card-content">
-                <div class="content">
-                  Lorem ipsum leo risus, porta ac consectetur ac, vestibulum at
-                  eros. Donec id elit non mi porta gravida at eget metus. Cum
-                  sociis natoque penatibus et magnis dis parturient montes,
-                  nascetur ridiculus mus. Cras mattis consectetur purus sit amet
-                  fermentum.
-                </div>
-              </div>
-              <div class="card">
-               <footer class="card-footer">
-                   <router-link to="/DetailEvent" class="button is-black is-light btn-footer">
-                    Consulter
-                  </router-link>
-                  <button class="button is-success is-light btn-footer">
-                    Accepter
-                  </button>
-                   <button class="button is-danger is-light btn-footer">
-                    Refuser
-                  </button>
-                </footer>
-              </div>
-            </div>
-            <div class="card mb-5">
-              <div class="card-content">
-                <div class="content">
-                  Lorem ipsum leo risus, porta ac consectetur ac, vestibulum at
-                  eros. Donec id elit non mi porta gravida at eget metus. Cum
-                  sociis natoque penatibus et magnis dis parturient montes,
-                  nascetur ridiculus mus. Cras mattis consectetur purus sit amet
-                  fermentum.
-                </div>
-              </div>
-              <div class="card">
-             <footer class="card-footer">
-                   <router-link to="/DetailEvent" class="button is-black is-light btn-footer">
-                    Consulter
-                  </router-link>
-                  <button class="button is-success is-light btn-footer">
-                    Accepter
-                  </button>
-                   <button class="button is-danger is-light btn-footer">
-                    Refuser
-                  </button>
-             </footer>
               </div>
             </div>
           </div>
@@ -88,16 +34,59 @@
 </template>
 
 <script>
-export default {};
+export default {
+  data() {
+    return {
+      user_id: this.$store.state.member.id,
+      user_invitations: [],
+      events: [],
+    }
+  },
+  mounted() {
+    this.getInvitationsByUserId();
+  },
+  methods: {
+    getInvitationsByUserId() {
+      this.$api
+        .get(`users/${this.user_id}/invitations/`)
+        .then((response) => {
+          this.user_invitations = response.data.invitations;
+            this.$store.commit('setInvitations',this.user_invitations);
+          this.getEventsOfInvitations();
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+    getEventsOfInvitations() {
+      if (this.user_invitations) {
+        this.user_invitations.forEach(invitation => {
+          this.$api
+            .get(`/events/${invitation.idEvent}`)
+            .then((response) => {
+              this.events.push(response.data.event)
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        })
+      }
+    },
+  }
+};
 </script>
 
 <style lang="scss">
-.title{
-    color : white;
+.title {
+  color: white;
 }
 
+.title-event{
+  color : black;
+}
 .btn-footer {
-  margin: 10px 0em 10px 5em;
-  width: 5em;
+  margin-left : 15em;
+  margin-bottom: 1em;
+  width: 7em;
 }
 </style>

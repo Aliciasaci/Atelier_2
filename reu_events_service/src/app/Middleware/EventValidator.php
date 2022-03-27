@@ -8,12 +8,12 @@ class EventValidator{
         return [
             'titre' => v::stringType()->notEmpty(),
             'description' => v::stringType()->notEmpty(),
-            'dateEvent' => [
-                'date'=> V::date('d-m-Y')->min('now'),
-                'heure' => V::date('H:i')
-            ],
+            // 'dateEvent' => [
+            //     'date'=> V::date('DD-MM-YYYY')->min('now'),
+            //     'heure' => V::date('H:i:s')
+            // ],
             'lieu' => v::stringType()->notEmpty(),
-            'idCreateur' => v::noWhitespace()->length(1, 36)
+            'idCreateur' => v::noWhitespace()->length(1, 72)
         ];
     }
 

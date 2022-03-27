@@ -20,6 +20,7 @@ $app->add(Middleware::class. ':corsHeaders');
 $app->options('/{routes:.+}', function ($request, $response, $args) {
     return $response;
 });
+
 $app->run();
 
 

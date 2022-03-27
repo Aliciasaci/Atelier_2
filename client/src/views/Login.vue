@@ -19,7 +19,7 @@
               <div class="field">
                 <label class="label">Password</label>
                 <div>
-                  <input class="input is-small" type="text" v-model="password"
+                  <input class="input is-small" type="password" v-model="password"
                     placeholder="Veuillez saisir votre mot de passe" />
                 </div>
                 <p v-if="responseMessage" class="help is-danger">{{responseMessage}}</p>
@@ -64,8 +64,8 @@ export default {
                     }
               )
               .then((response) => {
-               console.log(response);
                 this.$store.commit("setToken", response.data.token);
+                this.$store.commit("setMember", response.data.user);
                 this.$router.push("Accueil");
               })
               .catch((error) => {

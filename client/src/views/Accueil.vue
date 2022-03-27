@@ -12,94 +12,86 @@
                   <router-link
                     class="button button is-info is-hovered"
                     to="/FormEvent"
-                    >Créer un évènement</router-link
-                  >
+                  >Créer un évènement</router-link>
                 </div>
               </div>
             </div>
-            <div class="card mb-5">
+            <div class="card mb-5" v-for="event in events" :key="event.id">
               <div class="card-content">
-                <div class="content">
-                  Lorem ipsum leo risus, porta ac consectetur ac, vestibulum at
-                  eros. Donec id elit non mi porta gravida at eget metus. Cum
-                  sociis natoque penatibus et magnis dis parturient montes,
-                  nascetur ridiculus mus. Cras mattis consectetur purus sit amet
-                  fermentum.
-                </div>
+                <p class="title event is-5">{{ event.titre }}</p>
+                <p class="content">{{ event.description }}</p>
+                <p class="subtitle event is-6">
+                  <b>Organisateur :</b>
+                  {{ $store.state.member.username }}
+                </p>
+                <p class="subtitle event is-6">
+                  <b>Adresse :</b>
+                  {{ event.lieu }}
+                  <b>Le :</b>
+                  <time datetime="2016-1-1">{{ event.dateEvent }}</time>
+                </p>
               </div>
               <div class="card">
                 <footer class="card-footer">
-                  <button class="button is-warning is-light btn-footer">
-                    Modifier
-                  </button>
-                  <button class="button is-danger is-light btn-footer">
-                    Supprimer
-                  </button>
-                  <button class="button is-info is-light btn-footer">
-                    Inviter
-                  </button>
-                  <button class="button is-black is-light btn-footer">
-                    lien
-                  </button>
-                </footer>
-              </div>
-            </div>
-            <div class="card mb-5">
-              <div class="card-content">
-                <div class="content">
-                  Lorem ipsum leo risus, porta ac consectetur ac, vestibulum at
-                  eros. Donec id elit non mi porta gravida at eget metus. Cum
-                  sociis natoque penatibus et magnis dis parturient montes,
-                  nascetur ridiculus mus. Cras mattis consectetur purus sit amet
-                  fermentum.
-                </div>
-              </div>
-              <div class="card">
-                <footer class="card-footer">
-                  <button class="button is-warning is-light btn-footer">
-                    Modifier
-                  </button>
-                  <button class="button is-danger is-light btn-footer">
-                    Supprimer
-                  </button>
-                  <button class="button is-info is-light btn-footer">
-                    Inviter
-                  </button>
-                  <button class="button is-black is-light btn-footer">
-                    lien
-                  </button>
-                </footer>
-              </div>
-            </div>
-            <div class="card mb-5">
-              <div class="card-content">
-                <div class="content">
-                  Lorem ipsum leo risus, porta ac consectetur ac, vestibulum at
-                  eros. Donec id elit non mi porta gravida at eget metus. Cum
-                  sociis natoque penatibus et magnis dis parturient montes,
-                  nascetur ridiculus mus. Cras mattis consectetur purus sit amet
-                  fermentum.
-                </div>
-              </div>
-              <div class="card">
-                <footer class="card-footer">
-                  <button class="button is-warning is-light btn-footer">
-                    Modifier
-                  </button>
-                  <button class="button is-danger is-light btn-footer">
-                    Supprimer
-                  </button>
-                  <button class="button is-info is-light btn-footer">
-                    Inviter
-                  </button>
-                  <button class="button is-black is-light btn-footer">
-                    lien
-                  </button>
+                  <button class="button is-warning is-light btn-footer">Modifier</button>
+                  <button
+                    class="button is-danger is-light btn-footer js-modal-trigger"
+                    data-target="supprimer"
+                    @click="deleteEvent(event.id)"
+                  >Supprimer</button>
+                  <button
+                    class="button is-info is-light btn-footer js-modal-trigger"
+                    data-target="inviter"
+                    @click="showModalInvite()"
+                  >Inviter</button>
+                  <button
+                    class="button is-black is-light btn-footer js-modal-trigger"
+                    data-target="lien"
+                    @click="showModalLien(event.id)"
+                  >lien</button>
                 </footer>
               </div>
             </div>
           </div>
         </div>
+      </div>
+    </div>
+    <!-- Modals -->
+    <div id="inviter" class="modal" :class="{ 'is-active': showModalFlagI }">
+      <div class="modal-background"></div>
+      <div class="modal-card">
+        <header class="modal-card-head">
+          <p class="modal-card-title">Inviter</p>
+          <button class="delete" aria-label="close" @click="cancelModalInvite"></button>
+        </header>
+        <section class="modal-card-body">
+          <input class="input is-link" type="text" placeholder="Entrer le username ou l'email" />
+        </section>
+        <footer class="modal-card-foot">
+          <button class="button is-success">Envoyer</button>
+          <button class="button ml-2" @click="cancelModalInvite">Annuler</button>
+        </footer>
+      </div>
+    </div>
+    <div id="lien" class="modal" :class="{ 'is-active': showModalFlagL }">
+      <div class="modal-background"></div>
+      <div class="modal-card">
+        <header class="modal-card-head">
+          <p class="modal-card-title">Lien</p>
+          <button class="delete" aria-label="close" @click="cancelModalLien"></button>
+        </header>
+
+        <section class="modal-card-body">
+          <input
+            class="input is-link"
+            type="text"
+            placeholder="Entrer le username ou l'email"
+            v-model="eventLink"
+          />
+        </section>
+        <footer class="modal-card-foot">
+          <button class="button" @click="cancelModalLien">Cancel</button>
+        </footer>
       </div>
     </div>
   </section>
@@ -108,32 +100,62 @@
 <script>
 export default {
   data() {
-    return {};
+    return {
+      events: [],
+      showModalFlagI: false,
+      showModalFlag: false,
+      showModalFlagL: false,
+      eventLink: "http://localhost:8080/DetailEvent/", //!changer ça pour le server de docketu
+    };
   },
-  mounted :{
-    getEventsByUser(){
-        this.$api
-              .post("auth",
-                    {},
-                    {
-                        auth: {
-                            username: this.email,
-                            password: this.password,
-                        },
-                    }
-              )
-              .then((response) => {
-               console.log(response);
-                this.$store.commit("setToken", response.data.token);
-                this.$router.push("Accueil");
-              })
-              .catch((error) => {
-                console.log(error);
-                this.responseMessage = "Email ou mots de passe incorrecte";
-              });
-          }
+  mounted() {
+    this.$api
+      .get(`events/creators/${this.$store.state.member.id}`)
+      .then((response) => {
+        this.events = response.data.event;
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   },
-  methods: {},
+  methods: {
+    deleteEvent(id) {
+      if (id) {
+        if (confirm("êtes-vous sûre de vouloir supprimer cet évènement ?")) {
+          this.$api.delete(`events/${id}`)
+            .then((response) => {
+              console.log(response);
+              location.reload();
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        }
+      }
+    },
+    generateEventLink(id) {
+      if (id) {
+        this.eventLink += id;
+      }
+    },
+    showModalInvite() {
+      this.showModalFlagI = true;
+    },
+    cancelModalInvite() {
+      this.showModalFlagI = false;
+    },
+    cancelModalSupp() {
+      this.showModalFlag = false;
+    },
+    showModalLien(id) {
+      this.showModalFlagL = true;
+      this.generateEventLink(id);
+    },
+    cancelModalLien() {
+      this.showModalFlagL = false;
+      this.eventLink = "http://localhost:8080/DetailEvent/";
+    },
+  },
 };
 </script>
 <style lang="scss">
@@ -145,4 +167,9 @@ export default {
   margin: 10px 0em 10px 3em;
   width: 5em;
 }
+.event {
+  color: black;
+}
+
+//31fd9fac19b0e13c01528246f92d4a9aa18869bbe5aa5581035be9ea3421ac9b0e5ce1d8
 </style>

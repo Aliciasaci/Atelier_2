@@ -12,23 +12,20 @@
                   <div class="media-left mr-4">
                     <figure class="image is-48x48">
                       <img
-                        src="https://bulma.io/images/placeholders/96x96.png"
-                        alt="Placeholder image"
+                        :src="avatar(this.$store.state.member)"
                       />
                     </figure>
                   </div>
                   <div class="media-content">
-                    <p class="title is-4 principal">John Smith</p>
-                    <p class="subtitle is-6">@johnsmith</p>
+                    <p class="title is-4 principal">{{this.$store.state.member.username}}</p>
+                    <p class="subtitle is-6">@{{this.$store.state.member.email}}</p>
                   </div>
                 </div>
 
-                <div class="content">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                  Phasellus nec iaculis mauris. <a>@bulmaio</a>.
-                  <a href="#">#css</a> <a href="#">#responsive</a>
+                <div class="content ml-4">
+                  {{this.$store.state.member.description}}
                   <br />
-                  <time datetime="2016-1-1">11:09 PM - 1 Jan 2016</time>
+                  <time datetime="2016-1-1"><b>a rejoins le : </b>{{this.$store.state.member.created_at.substr(0,10)}}<b> à </b>{{this.$store.state.member.created_at.substr(11,8)}}</time>
                 </div>
               </div>
             </div>
