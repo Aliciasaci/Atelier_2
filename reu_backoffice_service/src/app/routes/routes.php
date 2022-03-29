@@ -51,6 +51,9 @@ $app->post('/visiteurs[/]',BackofficeController::class. ':createVisiteur')->setN
 //Get les information d'un user par son Id
 $app->get('/users/{id}[/]',BackofficeController::class. ':getUserInformations')->setName('getUserInformations')->add(Middleware::class.':putIntoJson');
 
+//Update les inforamtions du profil d'un user
+$app->put('/users/{id}/informations[/]',BackofficeController::class. ':updateUserInformations')->setName('updateUserInformations')->add(Middleware::class.':putIntoJson')->add(Middleware::class. ':check');
+
 //Supprimer les events inactifs
 $app->delete('/events[/]',BackofficeController::class. ':deleteEvent')->setName('deleteEvent')->add(middleware::class. ':putIntoJson')->add(Middleware::class. ':check');
 

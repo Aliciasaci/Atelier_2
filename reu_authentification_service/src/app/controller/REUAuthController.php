@@ -43,7 +43,7 @@ class REUAuthController //extends Controller
         list($email, $pass) = explode(':', $authstring);
 
         try {
-            $user = User::select('id', 'username', 'email', 'password', 'refresh_token', 'created_at', 'description', 'updated_at','role')
+            $user = User::select('id', 'username', 'email', 'password', 'refresh_token', 'created_at', 'description', 'updated_at', 'role')
                 ->where('email', '=', $email)
                 ->firstOrFail();
 
@@ -285,28 +285,79 @@ class REUAuthController //extends Controller
         }
     }
 
-     //Get les informations d'un user
-     public function getUserInformations(Request $req, Response $resp, array $args): Response
-     {
-         $user_id = $args['id'] ?? null;
- 
-         if (!isset($user_id)) {
-             ($this->c->get('logger.error'))->error("error: empty input");
-             return Writer::json_error($resp, 403, "empty input");
-         } else {
-             try {
-                 $user = User::select(['username','email','id','description'])->where("id", "=", $user_id)->firstOrFail();
-                 $datas_resp = [
-                     "type" => "user",
-                     "result" => $user,
-                 ];
- 
-                 return Writer::json_output($resp, 200, $datas_resp);
-             } catch (ModelNotFoundException $e) {
-                 return Writer::json_error($resp, 404, 'Ressource not found ');
-             } catch (\Exception $e) {
-                 return Writer::json_error($resp, 500, 'Server Error : Can\'t create event' . $e->getMessage());
-             }
-         }
-     }
+    //Get les informations d'un user
+    public function getUserInformations(Request $req, Response $resp, array $args): Response
+    {
+        $user_id = $args['id'] ?? null;
+
+        if (!isset($user_id)) {
+            ($this->c->get('logger.error'))->error("error: empty input");
+            return Writer::json_error($resp, 403, "empty input");
+        } else {
+            try {
+                $user = User::select(['username', 'email', 'id', 'description','sexe','dn','tel'])->where("id", "=", $user_id)->firstOrFail();
+                $datas_resp = [
+                    "type" => "user",
+                    "result" => $user,
+                ];
+
+                return Writer::json_output($resp, 200, $datas_resp);
+            } catch (ModelNotFoundException $e) {
+                return Writer::json_error($resp, 404, 'Ressource not found ');
+            } catch (\Exception $e) {
+                return Writer::json_error($resp, 500, 'Server Error : Can\'t create event' . $e->getMessage());
+            }
+        }
+    }
+
+
+    //Modifier les information du profil user dans
+    public function updateUserInformations(Request $req, Response $resp, array $args): Response
+    {
+        $user_id = $args['id'] ?? null;
+        $user_inforamtions = $req->getParsedBody()['params'] ?? null;
+
+        if (!isset($user_id)) {
+            return Writer::json_error($resp, 400, "missing 'id Createur'");
+            $this->c->get('logger.error')->error("error : missing input 'id Createur'");
+        };
+        try {
+
+            $new_user = User::Select(['id', 'username', 'email', 'description', 'dn', 'sexe'])->findOrFail($user_id);
+
+            //Filtrer les données reçues
+            if (isset($user_inforamtions[0])) {
+                $new_user->username = filter_var($user_inforamtions[0], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            }
+            if (isset($user_inforamtions[1])) {
+                $new_user->email = filter_var($user_inforamtions[1], FILTER_VALIDATE_EMAIL);
+            }
+            if (isset($user_inforamtions[2])) {
+                $new_user->description = filter_var($user_inforamtions[2], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            }
+            if (isset($user_inforamtions[3])) {
+                $new_user->sexe = filter_var($user_inforamtions[3], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            }
+            if (isset($user_inforamtions[4])) {
+                $new_user->tel = filter_var($user_inforamtions[4], FILTER_VALIDATE_INT);
+            }
+            if (isset($user_inforamtions[5])) {
+                $new_user->dn = $user_inforamtions[5];
+            }
+            $new_user->save();
+
+            $response = [
+                "user" => $new_user
+            ];
+
+            return Writer::json_output($resp, 200, $response);
+        } catch (ModelNotFoundException $e) {
+            return Writer::json_error($resp, 404, "user inconnue : {$args}");
+            $this->c->get('logger.error')->error("error : 'user inconnue : {$args}'");
+        } catch (\Exception $e) {
+            return Writer::json_error($resp, 500, $e->getMessage());
+            $this->c->get('logger.error')->error("error :" . $e->getMessage());
+        }
+        return $resp;
+    }
 }

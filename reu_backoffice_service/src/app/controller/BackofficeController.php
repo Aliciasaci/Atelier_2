@@ -353,6 +353,46 @@ class backofficeController
                ->withBody($response->getBody());
            return $resp;
        }
-  
 
+         //récupérer les informations d'un user par son id
+         public function updateUserInformations(Request $req, Response $resp, array $args): Response
+         {
+             $id_user = $args['id'] ?? null;
+             $user_inforamtions = $req->getParsedBody() ?? null;
+     
+             $client = new \GuzzleHttp\Client([
+                 'base_uri' => $this->c->get('settings')['auth_service'],
+                 'timeout' => 5.0
+             ]);
+     
+             $params = [];
+             if(isset($user_inforamtions['username'])){
+                 array_push($params, $user_inforamtions['username']);
+             }
+             if(isset($user_inforamtions['email'])){
+                array_push($params, $user_inforamtions['email']);
+            }
+            if(isset($user_inforamtions['description'])){
+                array_push($params, $user_inforamtions['description']);
+            }
+            if(isset($user_inforamtions['sexe'])){
+                array_push($params, $user_inforamtions['sexe']);
+            }
+            if(isset($user_inforamtions['tel'])){
+                array_push($params, $user_inforamtions['tel']);
+            }
+            if(isset($user_inforamtions['dn'])){
+                array_push($params, $user_inforamtions['dn']);
+            }
+
+             $response = $client->request('PUT', '/users/'.$id_user.'/informations/', [
+                'form_params' => [
+                    'params' => $params
+                ],
+             ]);
+     
+             $resp = $resp->withStatus($response->getStatusCode())->withHeader('Content-Type', $response->getHeader('Content-Type'))
+                 ->withBody($response->getBody());
+             return $resp;
+         }
 }

@@ -22,9 +22,10 @@ export default {
     if (!this.$store.state.token) {
       this.seConnecter();
     } else {
-      if(this.$store.state.member.role == 100){   //empêcher un inviter d'accéder à l'Acceuil
-        this.$router.push("/Accueil");
-      }
+      // if(this.$store.state.member.role == 100){   //empêcher un inviter d'accéder à l'Acceuil
+      //   this.$router.push("/Accueil");
+      // }
+      //  this.$router.push("/Accueil");
     }
   },
   methods: {

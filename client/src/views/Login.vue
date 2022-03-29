@@ -50,7 +50,7 @@
             <div>
               <div class="box">
                 <p class="is-text invite-text" data-target="inviter" @click="showModalInvite()">
-                  <u>Continuer en tant qu'invité</u>
+                  <u>Continuer en tant que visiteur</u>
                 </p>
               </div>
             </div>

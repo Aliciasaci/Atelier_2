@@ -39,3 +39,9 @@ $app->post('/visiteurs[/]',REUAuthController::class. ':createVisiteur')->setName
 
 //Get les informations d'un user
 $app->get('/users/{id}[/]',REUAuthController::class. ':getUserInformations')->setName('getUserInformations')->add(Middleware::class.':putIntoJson');
+
+//Modifier le profil d'un user
+$app->put('/users/{id}/informations[/]',REUAuthController::class. ':updateUserInformations')->setName('updateUserInformations')->add(Middleware::class.':putIntoJson');
+
+
+
