@@ -24,11 +24,7 @@ class EventController
     public function insertEvent(Request $req, Response $resp, array $args): Response
     {
         $received_event = $req->getParsedBody();
-
-        if ($req->getAttribute('has_errors')) {
-
-            $errors = $req->getAttribute('errors');
-
+            $errors = $req->getAttribute('errors') ?? null;
             if (isset($errors['titre'])) {
                 ($this->c->get('logger.error'))->error("error: invalid input", $errors['titre']);
                 return Writer::json_error($resp, 403, "Le champ 'titre' ne doit pas être vide");
@@ -37,14 +33,10 @@ class EventController
                 ($this->c->get('logger.error'))->error("error: invalid input", $errors['description']);
                 return Writer::json_error($resp, 403, "Le champ 'description' ne doit pas être vide et doit être valide");
             }
-            if (isset($errors['dateEvent.date'])) {
-                ($this->c->get('logger.error'))->error("error: invalid input", $errors['dateEvent.date']);
-                return Writer::json_error($resp, 403, "La date de réunion ne doit pas être inférieur à la date d'aujourd'hui et doit être le format d-m-Y");
-            }
-            if (isset($errors['dateEvent.heure'])) {
-                $this->container->get('logger.error')->error("error: invalid input", $errors['dateEvent.heure']);
-                return Writer::json_error($resp, 403, '"heure" : invalid input. H:i format expected');
-            }
+            // if (isset($errors['dateEvent.date'])) {
+            //     ($this->c->get('logger.error'))->error("error: invalid input", $errors['dateEvent.date']);
+            //     return Writer::json_error($resp, 403, "La date de réunion ne doit pas être inférieur à la date d'aujourd'hui et doit être le format d-m-Y");
+            // }
             if (isset($errors['lieu'])) {
                 ($this->c->get('logger.error'))->error("error: invalid input", $errors['lieu']);
                 return Writer::json_error($resp, 403, "Le champ lieu ne doit pas être vide");
@@ -53,8 +45,6 @@ class EventController
                 ($this->c->get('logger.error'))->error("error", $errors['idCreateur']);
                 return Writer::json_error($resp, 403, "invalid idCreateur");
             }
-        };
-
         try {
             //Création du token unique et cryptographique
             $token_event = random_bytes(32);
@@ -69,7 +59,7 @@ class EventController
             $new_event->titre = filter_var($received_event['titre'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
             $new_event->description = filter_var($received_event['description'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
             $temp_event_date = new  DateTime($received_event['dateEvent']['date'] . ' ' . $received_event['dateEvent']['heure']);
-            $new_event->dateEvent =  $temp_event_date->format('Y-m-d H:i:s');
+            $new_event->dateEvent =  $temp_event_date->format('Y-m-d H:i');
             $new_event->lieu = filter_var($received_event['lieu'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
             $new_event->idCreateur = filter_var($received_event['idCreateur'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
             $new_event->token = $token_event;
@@ -129,9 +119,8 @@ class EventController
 
     public function getEvent(Request $req, Response $resp, array $args): Response
     {
-        $id_event = $args['id'];
+        $id_event = $args['id'] ?? null;
         try {
-
             $event = Event::select(['id', 'titre', 'description', 'idCreateur', 'dateEvent', 'lieu', 'created_at'])
                 ->where('id', '=', $id_event)
                 ->firstOrFail();
@@ -221,5 +210,91 @@ class EventController
             $this->c->get('logger.error')->error("error :" . $e->getMessage());
         }
         return $resp;
+    }
+
+    //Delete tous les évènement expirés 
+    public function deleteEventsExpired(Request $req, Response $resp, array $args): Response
+    {
+        $listIdEvents = Event::select(['id'])->get();
+
+        $body = [
+            'lenght' => 0,
+            'events' => []
+        ];
+
+        foreach ($listIdEvents as $idEvent) {
+            $event = Event::find($idEvent->id);
+
+            $date_now = new  DateTime();
+            $date_6months = date('Y-m-d H:i:s', strtotime("+6 months", strtotime($event['dateEvent'])));
+            $date_convert = new DateTime($date_6months);
+
+
+            $diff = date_diff($date_now, $date_convert)->format('%R');
+            if ($diff == '-') {
+                $event->delete();
+                $res = "event deleted";
+            } else
+                $res = "can't delete event, not expired yet";
+
+
+            $response =  [
+                'status' => $res,
+                'event'  => $event
+            ];
+            array_push($body['events'], $response);
+        }
+
+        $resp->getBody()->write(json_encode($body));
+        return writer::json_output($resp, 200);
+    }
+
+
+    //get Events By idCreator
+    public function getEventByIdCreator(Request $req, Response $resp, array $args): Response
+    {
+        $id_creator = $args['id'] ?? null;
+
+        try {
+            $event = Event::select(['id', 'titre', 'description', 'idCreateur', 'dateEvent', 'lieu', 'created_at'])
+                ->where('idCreateur', '=', $id_creator)->get();
+
+            $datas_resp = [
+                "type" => "event",
+                "event" => $event,
+                "idCreateur" => $id_creator,
+            ];
+
+            $resp->getBody()->write(json_encode($datas_resp));
+            return writer::json_output($resp, 200);
+        } catch (ModelNotFoundException $e) {
+            return Writer::json_error($resp, 404, "Event not found");
+        }
+    }
+
+
+    public function deleteEventById(Request $req, Response $resp, array $args): Response
+    {
+        $id_event = $args['id'] ?? null;
+        try {
+            $event = Event::findOrFail($id_event);
+            if ($event->delete()) {
+                $datas_resp = [
+                    "type" => "event",
+                    "event" => $event,
+                    "response" => "event deleted",
+                ];
+            } else {
+                $datas_resp = [
+                    "type" => "event",
+                    "event" => $event,
+                    "response" => "event couldn't be deleted"
+                ];
+            }
+            $resp->getBody()->write(json_encode($datas_resp));
+            return writer::json_output($resp, 200);
+        } catch (ModelNotFoundException $e) {
+            return Writer::json_error($resp, 404, "Event not found");
+        }
     }
 }

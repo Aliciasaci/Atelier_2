@@ -40,10 +40,16 @@ const routes = [{
             import ('../views/Invitations.vue')
     },
     {
-        path: '/DetailEvent',
+        path: '/DetailEvent/:id',
         name: 'DetailEvent',
         component: () =>
             import ('../views/DetailEvent.vue')
+    },
+    {
+        path: '/LogOut/',
+        name: 'LogOut',
+        component: () =>
+            import ('../views/LogOut.vue')
     },
 ]
 

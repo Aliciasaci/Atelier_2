@@ -6,19 +6,18 @@ import { Outils } from "./mixins/Outils.js";
 Vue.mixin(Outils);
 import axios from "axios";
 
-// Vue.prototype.$api = new axios.create({
-//     baseURL: "https://allweb.fun/coop/api/",
-//     params: {},
-//     headers: { Authorization: "bdfbc0e776274ecb4bcda97bf6f8535cae1c6f6b" },
-// });
+Vue.prototype.$api = new axios.create({
+    baseURL: "http://api.backoffice.local:62364/",
+    params: {},
+    headers: {}
+});
 
-// Vue.prototype.$api.interceptors.request.use(function(config) {
-//     if (store.state.token) {
-//         config.params.token = store.state.token; //le token de connexion vers le compte utilisateur
-//     }
-//     return config;
-// });
-
+Vue.prototype.$api.interceptors.request.use(function(config) {
+    if (store.state.token) {
+        config.headers.Authorization = `Bearer ${store.state.token}`
+    }
+    return config;
+});
 
 Vue.config.productionTip = false
 

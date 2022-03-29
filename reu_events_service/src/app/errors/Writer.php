@@ -10,14 +10,12 @@ class Writer extends \Exception{
 
     public static function json_error(Response $resp, int $code_error, string $msg) : Response{
 
-        // message d'erreur
         $data = [
             'type' => 'error',
             'error' => $code_error,
             'message' => $msg
         ];
 
-        // header response
         $resp = $resp->withStatus($code_error)
                      ->withHeader('Content-Type', 'application/json; charset=utf-8');
 
