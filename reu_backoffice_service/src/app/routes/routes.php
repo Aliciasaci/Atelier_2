@@ -59,3 +59,9 @@ $app->delete('/events[/]',BackofficeController::class. ':deleteEvent')->setName(
 
 //Supprimer les users inactifs
 $app->delete('/users[/]',BackofficeController::class. ':deleteUser')->setName('deleteUser')->add(Middleware::class.':putIntoJson')->add(Middleware::class. ':check');
+
+//On crée un commentaire
+$app->post('/comments[/]',BackofficeController::class.':createComment')->setName('createComment')->add(middleware::class.':putIntoJson')->add(Middleware::class. ':check');
+
+//Get les commentaire d'un event
+$app->get('/events/{id}/comments[/]',BackofficeController::class.':getCommentsOfEvent')->setName('getCommentsOfEvent')->add(middleware::class.':putIntoJson')->add(Middleware::class. ':check');

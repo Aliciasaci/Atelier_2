@@ -19,9 +19,9 @@ class EventValidator{
 
     public static function comments_validators(){
         return [
-            'event' => V::stringType(),
-            'user' => V::stringType(),
-            'content' => V::stringType(),
+            'id_event' => V::stringType()->notEmpty(),
+            'id_user' => V::stringType()->notEmpty(),
+            'content' => V::stringType()->notEmpty(),
         ];
     }
 }             

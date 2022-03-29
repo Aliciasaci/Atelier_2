@@ -13,12 +13,15 @@
             <div class="box">
               <h4 class="title is-5 has-text-centered mb-20 title-chat">{{ event_data.titre }}</h4>
               <p>{{ event_data.description }}</p>
-              <p><b>Créateur: </b>{{createur_informations.username}} - {{createur_informations.email}}</p>
+              <p>
+                <b>Créateur:</b>
+                {{ createur_informations.username }} - {{ createur_informations.email }}
+              </p>
               <p>
                 <b>Date</b>
-                : {{ event_data.dateEvent.substr(0, 10) }}
+                : {{ event_data.dateEvent.substring(0, 10) }}
                 <b>à</b>
-                {{ event_data.dateEvent.substr(11, 8) }}
+                {{ event_data.dateEvent.substring(11, 8) }}
               </p>
               <p>
                 <b>Lieu</b>
@@ -63,7 +66,7 @@
               </div>
               <div class="column">
                 <div class="box">
-                  <h4 id="non-par" class="title is-6 title-chat has-text-centered">Ils ont dit non</h4>
+                  <h4 id="non-par" class="title is-2 title-chat has-text-centered">Ils ont dit non</h4>
                   <div class="box" v-for="p in non_participants" :key="p.id">
                     <p>
                       <i class="fa-solid fa-xmark mr-2"></i>
@@ -78,22 +81,12 @@
               <input
                 class="input box mt-6"
                 type="text"
-                placeholder="Votre message"
+                placeholder="Votre commentaire"
                 v-model="input_message"
               />
-              <div class="box mt-6">
-                <article class="media">
-                  <div class="media-left">
-                    <figure class="image is-32x32 mr-2">
-                      <img src="https://bulma.io/images/placeholders/128x128.png" alt="Image" />
-                    </figure>
-                  </div>
-                  <div class="media-content">
-                    <div class="content">
-                      <p>egestas. Nullam condimentum luctus turpis.</p>
-                    </div>
-                  </div>
-                </article>
+              <button class="button is-small is-outlined" @click="sendComment">send</button>
+              <div class="box mt-6" v-for="comment in comments" :key="comment.id">
+                <commentaire :commentaire="comment" :key="comment.id" />
               </div>
             </div>
           </div>
@@ -106,7 +99,7 @@
 <script>
 import axios from "axios";
 import { LMap, LTileLayer, LMarker, LCircle, LPopup } from "vue2-leaflet";
-import moment from "moment";
+import Commentaire from "../components/Commentaire.vue";
 export default {
   components: {
     LMap,
@@ -114,6 +107,7 @@ export default {
     LMarker,
     LCircle,
     LPopup,
+    Commentaire,
   },
   data() {
     return {
@@ -141,13 +135,15 @@ export default {
       event_actif: true,
       input_message: "",
       id_createur: null,
-      createur_informations : [],
+      createur_informations: [],
+      comments: [],
     };
   },
   mounted() {
     this.generateEventsInformations();
     this.getNonParticipants();
     this.getParticipants();
+    this.getCommentsOfEvent();
   },
   methods: {
     generateEventsInformations() {
@@ -170,16 +166,29 @@ export default {
           console.log(error);
         });
     },
-    getEventCreatorInformations(){
-      if(this.id_createur){
-       this.$api
-        .get(`users/${this.id_createur}`)
-        .then((response) => {
-          this.createur_informations = response.data.result;
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+    getCommentsOfEvent() {
+      if (this.event_id) {
+        this.$api
+          .get(`events/${this.event_id}/comments`)
+          .then((response) => {
+            this.comments = response.data.data;
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
+    },
+    getEventCreatorInformations() {
+      console.log(this.id_createur);
+      if (this.id_createur) {
+        this.$api
+          .get(`users/${this.id_createur}`)
+          .then((response) => {
+            this.createur_informations = response.data.result;
+          })
+          .catch((error) => {
+            console.log(error);
+          });
       }
     },
     addMarker(event) {
@@ -248,7 +257,6 @@ export default {
               response: "oui"
             })
             .then((response) => {
-              console.log(response)
               this.response_message = "L'invitation a bien été acceptée";
               this.response_status = true;
               window.setTimeout(function () { location.reload() }, 3000)
@@ -267,7 +275,6 @@ export default {
             response: "oui"
           })
           .then((response) => {
-            console.log(response)
             this.response_message = "L'invitation a bien été acceptée";
             this.response_status = true;
             window.setTimeout(function () { location.reload() }, 3000)
@@ -287,7 +294,6 @@ export default {
               response: "non",
             })
             .then((response) => {
-              console.log(response)
               this.response_message = "L'invitation a bien été refusée";
               this.response_status = true;
               window.setTimeout(function () { location.reload() }, 3000)
@@ -299,7 +305,6 @@ export default {
       })
       //Si c'est un user invité alors créer une instance invitation et renseigner la réponse
       if (this.$store.state.member.role == 0) {
-        console.log("ici");
         this.$api
           .post(`/invitations/`, {
             idUser: this.$store.state.member.id,
@@ -307,7 +312,6 @@ export default {
             response: "non"
           })
           .then((response) => {
-            console.log(response)
             this.response_message = "L'invitation a bien été refusée";
             this.response_status = true;
             window.setTimeout(function () { location.reload() }, 3000)
@@ -317,6 +321,24 @@ export default {
           });
       }
     },
+    sendComment() {
+      if (this.input_message) {
+        this.$api
+          .post(`comments/`, {
+            id_event: this.event_id,
+            id_user: this.$store.state.member.id,
+            content: this.input_message
+          })
+          .then((response) => {
+            console.log(response);
+             this.getCommentsOfEvent();
+             this.input_message = "";
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
+    }
   },
 };
 </script>

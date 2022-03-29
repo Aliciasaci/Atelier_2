@@ -35,6 +35,6 @@ $app->get('/events/creators/{id}[/]',EventController::class. ':getEventByIdCreat
 /**
  * ROUTES DES COMMENTS
  */
-$app->get('/comments/{idEvent}[/]',CommentController::class. ':getCommentsFromEvent')->setName('getCommentsFromEvent')->add(middleware::class. ':putIntoJson')->add(new Validation($commentsV));
+$app->get('/events/{id}/comments[/]',CommentController::class. ':getCommentsOfEvent')->setName('getCommentsOfEvent')->add(middleware::class. ':putIntoJson');
      
-$app->post('/comments[/]',CommentController::class.':create')->setName('createComment')->add(middleware::class.':putIntoJson')->add(new Validation($commentsV));
+$app->post('/comments[/]',CommentController::class.':createComment')->setName('createComment')->add(middleware::class.':putIntoJson');

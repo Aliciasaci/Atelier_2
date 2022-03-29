@@ -126,25 +126,23 @@ class EventController
                 ->firstOrFail();
 
 
-            $commandePath = $this->c->router->pathFor(
-                'getEvent',
-                ['id' => $id_event]
-            );
+            // $commandePath = $this->c->router->pathFor(
+            //     'getEvent',
+            //     ['id' => $id_event]
+            // );
 
             // Création des liens hateos
-            $hateoas = [
-                "self" => ["href" => $commandePath]
-            ];
+            // $hateoas = [
+            //     "self" => ["href" => $commandePath]
+            // ];
 
             // Création du body de la réponse
             $datas_resp = [
-                "type" => "event",
                 "event" => $event,
-                "links" => $hateoas,
             ];
 
-            $resp->getBody()->write(json_encode($datas_resp));
-            return writer::json_output($resp, 200);
+            // $resp->getBody()->write(json_encode($datas_resp));
+            return writer::json_output($resp, 200, $datas_resp);
         } catch (ModelNotFoundException $e) {
             $clientError = $this->c->clientError;
             return $clientError($req, $resp, 404, "Event not found" . $e->getMessage());
@@ -260,13 +258,11 @@ class EventController
                 ->where('idCreateur', '=', $id_creator)->get();
 
             $datas_resp = [
-                "type" => "event",
                 "event" => $event,
                 "idCreateur" => $id_creator,
             ];
 
-            $resp->getBody()->write(json_encode($datas_resp));
-            return writer::json_output($resp, 200);
+            return writer::json_output($resp, 200, $datas_resp);
         } catch (ModelNotFoundException $e) {
             return Writer::json_error($resp, 404, "Event not found");
         }

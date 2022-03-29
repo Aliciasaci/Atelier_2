@@ -188,7 +188,6 @@ class REUAuthController //extends Controller
                 "message" => "Une erreur est survenu lors de la suppression du compte, réessayer ultérieurement !"
             ]);
         }
-        $resp = $resp->withHeader('Content-Type', 'application/json;charset=utf-8');
         $resp->getBody()->write($body);
         return $resp;
     }
