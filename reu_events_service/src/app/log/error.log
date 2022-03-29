@@ -172,3 +172,5 @@
 [2022-03-27T21:19:58.803103+00:00] lbs.log.ERROR: error: invalid input ["null must be a string","null must not be empty"] []
 [2022-03-27T21:28:17.287720+00:00] lbs.log.ERROR: error: invalid input ["\"\" must not be empty"] []
 [2022-03-27T21:28:17.321647+00:00] lbs.log.ERROR: error: invalid input ["\"\" must not be empty"] []
+[2022-03-28T12:47:03.280837+00:00] lbs.log.ERROR: bad ressource : http://api.events.local/events/0ed275b0-9128-43d1-8893-3a1b9805e86c [] []
+[2022-03-28T13:59:15.112538+00:00] lbs.log.ERROR: bad ressource : http://api.events.local/events/a95144d2-1a31-458f-8665-35f5711056644 [] []

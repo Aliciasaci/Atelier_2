@@ -18,7 +18,10 @@
             </div>
             <div class="card mb-5" v-for="event in events" :key="event.id">
               <div class="card-content">
-                <p class="title event is-5">{{ event.titre }}</p>
+                <router-link :to="{ name: 'DetailEvent', params: { id: event.id } }">
+                  <p class="title event is-5">{{ event.titre }}</p>
+                </router-link>
+
                 <p class="content">{{ event.description }}</p>
                 <p class="subtitle event is-6">
                   <b>Organisateur :</b>
@@ -51,28 +54,54 @@
                   >lien</button>
                 </footer>
               </div>
+              <!-- Modals -->
+              <div id="inviter" class="modal" :class="{ 'is-active': showModalFlagI }">
+                <div class="modal-background"></div>
+                <div class="modal-card">
+                  <header class="modal-card-head">
+                    <p class="modal-card-title">Inviter</p>
+                    <button class="delete" aria-label="close" @click="cancelModalInvite"></button>
+                  </header>
+                  <section class="modal-card-body ml-0.5">
+                    <input
+                      class="input is-link"
+                      type="text"
+                      placeholder="Entrer le username ou l'email"
+                      v-model="input_search"
+                    />
+                    <div v-if="search_results" class="box search-result mt-2">
+                      <b>{{ search_results.username }}</b>
+                      <p class="subtitle is-6">{{ search_results.email }}</p>
+                      <button
+                        class="button is-success is-light"
+                        @click="createInvitation(event.id)"
+                      >Envoyer</button>
+                    </div>
+                    <div v-if="search_message" class="box search-result mt-2">
+                      <b>{{ search_message }}</b>
+                    </div>
+                  </section>
+                  <footer class="modal-card-foot">
+                    <button class="button ml-2 is-link is-outlined" @click="searchUser()">
+                      <i class="fa-solid fa-magnifying-glass"></i>
+                    </button>
+                    <button
+                      class="button ml-2 is-danger is-outlined"
+                      @click="effacerSearch()"
+                    >Effacer</button>
+                    <button
+                      class="button ml-2 is-dark is-outlined"
+                      @click="cancelModalInvite"
+                    >Annuler</button>
+                  </footer>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-    <!-- Modals -->
-    <div id="inviter" class="modal" :class="{ 'is-active': showModalFlagI }">
-      <div class="modal-background"></div>
-      <div class="modal-card">
-        <header class="modal-card-head">
-          <p class="modal-card-title">Inviter</p>
-          <button class="delete" aria-label="close" @click="cancelModalInvite"></button>
-        </header>
-        <section class="modal-card-body">
-          <input class="input is-link" type="text" placeholder="Entrer le username ou l'email" />
-        </section>
-        <footer class="modal-card-foot">
-          <button class="button is-success">Envoyer</button>
-          <button class="button ml-2" @click="cancelModalInvite">Annuler</button>
-        </footer>
-      </div>
-    </div>
+
     <div id="lien" class="modal" :class="{ 'is-active': showModalFlagL }">
       <div class="modal-background"></div>
       <div class="modal-card">
@@ -105,7 +134,10 @@ export default {
       showModalFlagI: false,
       showModalFlag: false,
       showModalFlagL: false,
+      input_search: "",
       eventLink: "http://localhost:8080/DetailEvent/", //!changer ça pour le server de docketu
+      search_results: null,
+      search_message: "",
     };
   },
   mounted() {
@@ -138,6 +170,26 @@ export default {
         this.eventLink += id;
       }
     },
+    searchUser() {
+      if (this.input_search) {
+        this.$api
+          .post("searches/",
+            {
+              search: this.input_search
+            }
+          ).then(response => {
+            console.log(response);
+            this.search_results = response.data.result;
+          }).catch(error => {
+            this.search_message = "Aucun résultat trouvé :(";
+          })
+      }
+    },
+    effacerSearch() {
+      this.input_search = null;
+      this.search_results = null;
+      this.search_message = null;
+    },
     showModalInvite() {
       this.showModalFlagI = true;
     },
@@ -155,6 +207,22 @@ export default {
       this.showModalFlagL = false;
       this.eventLink = "http://localhost:8080/DetailEvent/";
     },
+    createInvitation(idEvent) {
+      if (idEvent && this.search_results.id) {
+        console.log(idEvent);
+        console.log(this.search_results.id);
+        this.$api
+          .post("invitations/",
+            {
+              idEvent: idEvent,
+              idUser: this.search_results.id,
+              response: ""
+            }
+          ).then(response => {
+            console.log(response);
+          })
+      }
+    }
   },
 };
 </script>
@@ -169,6 +237,10 @@ export default {
 }
 .event {
   color: black;
+}
+
+.search-result {
+  background-color: rgb(221, 230, 221);
 }
 
 //31fd9fac19b0e13c01528246f92d4a9aa18869bbe5aa5581035be9ea3421ac9b0e5ce1d8

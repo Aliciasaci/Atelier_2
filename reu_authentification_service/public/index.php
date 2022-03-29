@@ -18,7 +18,6 @@ ReuBootstrap::startEloquent($c->settings['dbfile']);
 require_once __DIR__ . '/../src/app/routes/routes.php';
 
 //Ajouter les 2 middlewares putIntoJson à toute l'appli
-$app->add(middleware::class.':putIntoJson');
 $app->run();
 
 

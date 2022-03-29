@@ -7,6 +7,7 @@
           <div class="column is-7-tablet is-6-desktop is-5-widescreen">
             <h4 class="title is-5 has-text-centered mb-20">Créer un évènement</h4>
             <div class="box has-text-centered" v-if="response_message">{{response_message}}</div>
+            <div class="box has-text-centered error_message" v-if="error_message">{{ error_message }}</div>
             <form @submit.prevent="getCoordinateByAdresse">
               <div class="box">
                 <div class="field">
@@ -140,6 +141,7 @@ export default {
       input_date: null,
       input_time: null,
       response_message : "",
+      error_message : "",
     };
   },
   mounted() {
@@ -148,29 +150,36 @@ export default {
   },
   methods: {
     submitEvent() {
-      this.$api.post(`events/`, {
-        titre: this.input_titre,
-        description: this.input_description,
-        dateEvent: {
-          date: moment(this.input_date).format('DD-MM-YYYY'),
-          heure: this.input_time
-        },
-        idCreateur: this.$store.state.member.id,
-        lieu: this.addresse
-      })
-        .then((response) => {
-          console.log(response.data);
-          this.input_description = "";
-          this.input_titre = "";
-          this.input_time = "";
-          this.input_date = "";
-          this.addresse = "";
-          this.response_message = "Votre évènement a été crée avec succès !";
+      if(Date.parse(this.input_date +' '+this.input_time) > Date.now())
+      {
+        this.$api.post(`events/`, {
+          titre: this.input_titre,
+          description: this.input_description,
+          dateEvent: {
+            date: moment(this.input_date).format('DD-MM-YYYY'),
+            heure: this.input_time
+          },
+          idCreateur: this.$store.state.member.id,
+          lieu: this.addresse
         })
-        .catch((error) => {
-          console.log(error);
-             this.response_message = "Une erreur est parvenue lors de la création de votre évènement :( !";
-        });
+          .then((response) => {
+            console.log(response.data);
+            this.input_description = "";
+            this.input_titre = "";
+            this.input_time = "";
+            this.input_date = "";
+            this.addresse = "";
+            this.response_message = "Votre évènement a été crée avec succès !";
+          })
+          .catch((error) => {
+            console.log(error);
+              this.response_message = "Une erreur est parvenue lors de la création de votre évènement :( !";
+          });
+      }
+      else{
+        this.error_message = "La date et l'heure choisies sont inférieure à la date et l'heure actuelles";
+      }
+      
     },
     getCoordinateByUserIp() {
       axios
@@ -236,6 +245,9 @@ export default {
 .subtitle {
   color: white;
   font-family: "Poppins", sans-serif;
+}
+.error_message{
+  color: red;
 }
 //feb8d3c41d7747c7a7cd3b367fb9c161
 //

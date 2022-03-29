@@ -5,13 +5,6 @@ use \reu\backoffice\app\controller\BackofficeController;
 use \reu\backoffice\app\middleware\Middleware;
 use \reu\backoffice\app\middleware\Token;
 
-
-//Supprimer les events inactifs
-$app->delete('/events[/]',BackofficeController::class. ':deleteEvent')->setName('deleteEvent')->add(middleware::class. ':putIntoJson')->add(Middleware::class. ':check');
-
-//Supprimer les users inactifs
-$app->delete('/users[/]',BackofficeController::class. ':deleteUser')->setName('deleteUser')->add(Middleware::class.':putIntoJson')->add(Middleware::class. ':check');
-
 //S'authentifier
 $app->post('/auth[/]',BackofficeController::class. ':auth')->setName('auth')->add(Middleware::class.':putIntoJson');
 
@@ -22,7 +15,7 @@ $app->post('/signin[/]',BackofficeController::class. ':signIn')->setName('signIn
 $app->get('/events/creators/{id}[/]',BackofficeController::class. ':getEventByIdCreator')->setName('getEventByIdCreator')->add(Middleware::class.':putIntoJson')->add(Middleware::class. ':check');
 
 //Get un certain event par id
-$app->get('/events/{id}[/]',BackofficeController::class. ':getOneEvent')->setName('getOneEvent')->add(Middleware::class.':putIntoJson')->add(Middleware::class. ':check');
+$app->get('/events/{id}[/]',BackofficeController::class. ':getOneEvent')->setName('getOneEvent')->add(Middleware::class.':putIntoJson');  //!remettre la route du check ici
 
 // Get un certain event par id 
 $app->delete('/events/{id}[/]',BackofficeController::class. ':deleteEventById')->setName('deleteEventById')->add(Middleware::class.':putIntoJson')->add(Middleware::class. ':check');
@@ -34,7 +27,7 @@ $app->get('/events[/]',BackofficeController::class. ':getEvents')->setName('getE
 $app->post('/events[/]',BackofficeController::class. ':createEvent')->setName('createEvent')->add(Middleware::class.':putIntoJson')->add(Middleware::class. ':check');
 
 //Créer une participation
-$app->post('/participations[/]',BackofficeController::class. ':createPart')->setName('createPart')->add(Middleware::class.':putIntoJson')->add(Middleware::class. ':check');
+$app->post('/invitations[/]',BackofficeController::class. ':createInvitation')->setName('createInvitation')->add(Middleware::class.':putIntoJson')->add(Middleware::class. ':check');
 
 //Get les users qui ont dit oui à un certain event par id
 $app->get('/events/participations/{id}[/]',BackofficeController::class. ':getParByIdEvent')->setName('getParByIdEvent')->add(Middleware::class.':putIntoJson')->add(Middleware::class. ':check');
@@ -47,3 +40,19 @@ $app->get('/users/{id}/invitations[/]',BackofficeController::class. ':getInvitat
 
 //Update une invitation avec une réponse (oui ou non)
 $app->put('/invitations/{id}[/]',BackofficeController::class. ':updateInvitation')->setName('updateInvitation')->add(Middleware::class.':putIntoJson')->add(Middleware::class. ':check');
+
+//Chercher un user par son username ou email
+$app->post('/searches[/]',BackofficeController::class. ':searchUser')->setName('searchUser')->add(Middleware::class.':putIntoJson')->add(Middleware::class. ':check');
+
+//Créer une instance de visiteur
+//! on chèque pas de access token (puisqu'il n'existe pas encore)
+$app->post('/visiteurs[/]',BackofficeController::class. ':createVisiteur')->setName('createVisiteur')->add(Middleware::class.':putIntoJson');
+
+//Get les information d'un user par son Id
+$app->get('/users/{id}[/]',BackofficeController::class. ':getUserInformations')->setName('getUserInformations')->add(Middleware::class.':putIntoJson');
+
+//Supprimer les events inactifs
+$app->delete('/events[/]',BackofficeController::class. ':deleteEvent')->setName('deleteEvent')->add(middleware::class. ':putIntoJson')->add(Middleware::class. ':check');
+
+//Supprimer les users inactifs
+$app->delete('/users[/]',BackofficeController::class. ':deleteUser')->setName('deleteUser')->add(Middleware::class.':putIntoJson')->add(Middleware::class. ':check');

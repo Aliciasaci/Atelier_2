@@ -29,7 +29,7 @@ class ParticipationController //extends Controller
         $this->container = $container;
     }
 
-    public function createPar(Request $req, Response $resp, array $args): Response
+    public function createInvitation(Request $req, Response $resp, array $args): Response
     {
 
         $data = $req->getParsedBody();
@@ -56,7 +56,7 @@ class ParticipationController //extends Controller
             $parti->save();
 
             $data_rep = [
-                "Participation" => [
+                "Invitation" => [
                     "id" => $id_par,
                     "idEvent" => $data['idEvent'],
                     "idUser" => $data['idUser'],
@@ -68,7 +68,7 @@ class ParticipationController //extends Controller
             $data_rep = [
                 "type" => "error",
                 "error" => "404",
-                "message" => "Une erreur est survenu lors de la création de la participation"
+                "message" => "Une erreur est survenu lors de la création de l'invitation"
             ];
             return Writer::json_output($resp, 404, $data_rep);
         }
@@ -115,7 +115,7 @@ class ParticipationController //extends Controller
     {
         $id_user = $args['id'];
         if ($id_user) {
-            $invitations = Participant::select(['id', 'idEvent', 'idUser', 'response'])->where('idUser', '=', $id_user)->where('response', '=', "")->get();
+            $invitations = Participant::select(['id', 'idEvent', 'idUser', 'response'])->where('idUser', '=', $id_user)->where('response', '=',"")->get();
             $data_resp = [
                 "type" => "collection",
                 "invitations" => $invitations,

@@ -45,6 +45,12 @@ const routes = [{
         component: () =>
             import ('../views/DetailEvent.vue')
     },
+    {
+        path: '/LogOut/',
+        name: 'LogOut',
+        component: () =>
+            import ('../views/LogOut.vue')
+    },
 ]
 
 const router = new VueRouter({

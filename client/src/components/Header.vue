@@ -7,7 +7,7 @@
         >
       </div>
 
-      <div id="navbarBasicExample" class="navbar-menu">
+      <div id="navbarBasicExample" class="navbar-menu" v-if="this.$store.state.member.role == 100">
         <div class="navbar-start">
           <router-link class="navbar-item" to="/Accueil"><i class="fa-solid fa-calendar-check mr-2"></i>Mes évènements </router-link>
           <router-link class="navbar-item" to="/ProfilUser"><i class="fa-solid fa-user-tie mr-2"></i> Mon profil </router-link>
@@ -17,7 +17,7 @@
         <div class="navbar-end">
           <div class="navbar-item">
             <div class="buttons">
-              <a class="button is-dark is-small"> Se déconnecter </a>
+              <router-link to="/logOut" class="button is-dark is-small"> Se déconnecter </router-link>
             </div>
           </div>
         </div>

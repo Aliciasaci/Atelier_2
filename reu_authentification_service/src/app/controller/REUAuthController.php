@@ -43,7 +43,7 @@ class REUAuthController //extends Controller
         list($email, $pass) = explode(':', $authstring);
 
         try {
-            $user = User::select('id', 'username', 'email', 'password', 'refresh_token', 'created_at', 'description', 'updated_at')
+            $user = User::select('id', 'username', 'email', 'password', 'refresh_token', 'created_at', 'description', 'updated_at','role')
                 ->where('email', '=', $email)
                 ->firstOrFail();
 
@@ -103,10 +103,12 @@ class REUAuthController //extends Controller
         }
     }
 
+    //role 100 représente un user qui possède un compte
+    //un role 200 représente un user admin
+    //un role 0 représente un visiteur qui ne possède pas de compte
+
     public function create(Request $req, Response $resp, array $args): Response
     {
-
-
         $data = $req->getParsedBody() ?? null;
         if ($req->getAttribute('has_errors')) {
             $errors = $req->getAttribute('errors');
@@ -137,9 +139,6 @@ class REUAuthController //extends Controller
                 $user->role = 100;
                 $user->save();
 
-                //role 100 représente un user qui possède un compte
-                //un role 200 représente un user admin
-                //un role 0 représente un visiteur qui ne possède pas de compte
                 $body = json_encode([
                     "User" => [
                         "id" => $id,
@@ -157,11 +156,8 @@ class REUAuthController //extends Controller
                     "message" => "Une erreur est survenu lors de la création du compte, réessayer ultérieurement !"
                 ]);
             }
-            $data_rep = [
-                'created' =>  true,
-            ];
         }
-        return Writer::json_output($rs, 200, $data_rep);
+        return Writer::json_output($rs, 200);
     }
 
     public function delete(Request $req, Response $resp, array $args): Response
@@ -196,4 +192,121 @@ class REUAuthController //extends Controller
         $resp->getBody()->write($body);
         return $resp;
     }
+
+    //Rechercher un user par son psuedo ou e-mail
+    public function searchUser(Request $req, Response $resp, array $args): Response
+    {
+        $search_input = $req->getParsedBody() ?? null;
+
+        if (!isset($search_input['search'])) {
+            ($this->c->get('logger.error'))->error("error: empty input");
+            return Writer::json_error($resp, 403, "empty input, le champ à rechercher ne doit pas être vide");
+        } else {
+            try {
+                $searched_user = User::select(['id', 'username', 'email'])->where("username", "=", $search_input)->orwhere("email", "=", $search_input)->firstOrFail();
+                $datas_resp = [
+                    "type" => "user",
+                    "result" => $searched_user,
+                ];
+
+                return Writer::json_output($resp, 200, $datas_resp);
+            } catch (ModelNotFoundException $e) {
+                return Writer::json_error($resp, 404, 'Ressource not found ');
+            } catch (\Exception $e) {
+                return Writer::json_error($resp, 500, 'Server Error : Can\'t create event' . $e->getMessage());
+            }
+        }
+    }
+
+    //Créer une instance de visiteur avec seulement un ID et un username
+    public function createVisiteur(Request $req, Response $resp, array $args): Response
+    {
+        $data = $req->getParsedBody() ?? null;
+        if ($req->getAttribute('has_errors')) {
+            $errors = $req->getAttribute('errors');
+            $rs = $resp->withStatus(400);
+            $body = json_encode([
+                "type" => "error",
+                "error" => "400",
+                "message" => $errors
+            ]);
+
+            $rs->getBody()->write($body);
+            return $rs;
+        } else {
+            try {
+                $username = htmlspecialchars($data['username'], ENT_QUOTES);
+                $id = Uuid::uuid4();
+
+                $user = new User();
+                $user->id = $id;
+                $user->username = $username;
+                $user->role = 0;
+                $user->save();
+
+
+                //Lui crée un access token et refresh token.
+                $secret = $this->container->settings['secret'];
+                $token = JWT::encode(
+                    [
+                        'iss' => 'http://api.authentification.local/auth',
+                        'aud' => 'http://api.backoffice.local',
+                        'iat' => time(),
+                        'exp' => time() + (12 * 30 * 24),  //validité 30 jours
+                        'upr' => [
+                            'user_id' => $user->id,
+                            'username' => $user->username,
+                        ]
+                    ],
+                    $secret,
+                    'HS512'
+                );
+
+                $user->refresh_token = bin2hex(random_bytes(32));
+                $user->save();
+                $response = [
+                    "visiteur" => [
+                        "id" => $user->id,
+                        "role" => $user->role,
+                        "username" => $user->username,
+                        'token' =>  $token,
+                        'refresh_token' => $user->refresh_token
+                    ]
+                ];
+                return Writer::json_output($resp, 200, $response);
+            } catch (ModelNotFoundException $e) {
+                $response = [
+                    "type" => "error",
+                    "error" => "404",
+                    "message" => "Une erreur est survenu lors de la création du compte, réessayer ultérieurement !"
+                ];
+                return Writer::json_output($resp, 400, $response);
+            }
+        }
+    }
+
+     //Get les informations d'un user
+     public function getUserInformations(Request $req, Response $resp, array $args): Response
+     {
+         $user_id = $args['id'] ?? null;
+ 
+         if (!isset($user_id)) {
+             ($this->c->get('logger.error'))->error("error: empty input");
+             return Writer::json_error($resp, 403, "empty input");
+         } else {
+             try {
+                 $user = User::select(['username','email','id','description'])->where("id", "=", $user_id)->firstOrFail();
+                 $datas_resp = [
+                     "type" => "user",
+                     "result" => $user,
+                 ];
+ 
+                 return Writer::json_output($resp, 200, $datas_resp);
+             } catch (ModelNotFoundException $e) {
+                 return Writer::json_error($resp, 404, 'Ressource not found ');
+             } catch (\Exception $e) {
+                 return Writer::json_error($resp, 500, 'Server Error : Can\'t create event' . $e->getMessage());
+             }
+         }
+     }
 }

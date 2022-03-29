@@ -14,7 +14,6 @@ Vue.prototype.$api = new axios.create({
 
 Vue.prototype.$api.interceptors.request.use(function(config) {
     if (store.state.token) {
-        // config.headers.Authorization = store.state.token
         config.headers.Authorization = `Bearer ${store.state.token}`
     }
     return config;

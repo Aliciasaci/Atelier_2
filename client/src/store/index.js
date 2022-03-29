@@ -30,7 +30,7 @@ export default new Vuex.Store({
         },
         setInvitations(state, invitations) {
             state.invitations = invitations;
-        }
+        },
     },
     actions: {},
     modules: {}

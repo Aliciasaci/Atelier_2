@@ -194,7 +194,7 @@ class backofficeController
     //================= Participations =================//
 
     //Créer une participation
-    public function createPart(Request $req, Response $resp, array $args): Response
+    public function createInvitation(Request $req, Response $resp, array $args): Response
     {
         $data = $req->getParsedBody() ?? null;
         
@@ -204,7 +204,7 @@ class backofficeController
         ]);
 
 
-        $response = $client->request('POST', '/participations', [
+        $response = $client->request('POST', '/invitations', [
             'form_params' => [
                 'idUser' => $data['idUser'],
                 'idEvent' => $data['idEvent'],
@@ -291,8 +291,68 @@ class backofficeController
          return $resp;
      }
  
+     //rechercher un user par son username ou e-mail
+     public function searchUser(Request $req, Response $resp, array $args): Response
+     {
+         $data = $req->getParsedBody() ?? null;
+         
+         $client = new \GuzzleHttp\Client([
+             'base_uri' => $this->c->get('settings')['auth_service'],
+             'timeout' => 5.0
+         ]);
  
  
+         $response = $client->request('POST', '/searches', [
+             'form_params' => [
+                 'search' => $data['search'],
+             ],
+         ]);
+ 
+ 
+         $resp = $resp->withStatus($response->getStatusCode())->withHeader('Content-Type', $response->getHeader('Content-Type'))
+             ->withBody($response->getBody());
+         return $resp;
+     }
 
+     //Créer une instance de visiteur
+     public function createVisiteur(Request $req, Response $resp, array $args): Response
+     {
+         $data = $req->getParsedBody() ?? null;
+         
+         $client = new \GuzzleHttp\Client([
+             'base_uri' => $this->c->get('settings')['auth_service'],
+             'timeout' => 5.0
+         ]);
+ 
+ 
+         $response = $client->request('POST', '/visiteurs', [
+             'form_params' => [
+                 'username' => $data['username'],
+             ],
+         ]);
+ 
+ 
+         $resp = $resp->withStatus($response->getStatusCode())->withHeader('Content-Type', $response->getHeader('Content-Type'))
+             ->withBody($response->getBody());
+         return $resp;
+     }
+
+       //récupérer les informations d'un user par son id
+       public function getUserInformations(Request $req, Response $resp, array $args): Response
+       {
+           $id_user = $args['id'] ?? null;
+   
+           $client = new \GuzzleHttp\Client([
+               'base_uri' => $this->c->get('settings')['auth_service'],
+               'timeout' => 5.0
+           ]);
+   
+           $response = $client->request('GET', '/users/'.$id_user);
+   
+           $resp = $resp->withStatus($response->getStatusCode())->withHeader('Content-Type', $response->getHeader('Content-Type'))
+               ->withBody($response->getBody());
+           return $resp;
+       }
+  
 
 }
