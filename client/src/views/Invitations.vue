@@ -51,7 +51,7 @@ export default {
         .get(`users/${this.user_id}/invitations/`)
         .then((response) => {
           this.user_invitations = response.data.invitations;
-            this.$store.commit('setInvitations',this.user_invitations);
+          this.$store.commit('setInvitations',this.user_invitations);
           this.getEventsOfInvitations();
         })
         .catch((error) => {

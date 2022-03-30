@@ -38,7 +38,6 @@ export default {
         this.$api
           .get(`users/${this.id_author}`)
           .then((response) => {
-            console.log(response);
             this.author.username = response.data.result.username;
             this.author.email = response.data.result.email;
           })

@@ -6,6 +6,9 @@ use reu\backoffice\app\errors\Writer;
 use \Slim\Container;
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
+use reu\backoffice\app\models\Event;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+
 
 //JWT classes
 use Firebase\JWT\JWT;

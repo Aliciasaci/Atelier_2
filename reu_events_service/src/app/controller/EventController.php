@@ -33,10 +33,10 @@ class EventController
                 ($this->c->get('logger.error'))->error("error: invalid input", $errors['description']);
                 return Writer::json_error($resp, 403, "Le champ 'description' ne doit pas être vide et doit être valide");
             }
-            // if (isset($errors['dateEvent.date'])) {
-            //     ($this->c->get('logger.error'))->error("error: invalid input", $errors['dateEvent.date']);
-            //     return Writer::json_error($resp, 403, "La date de réunion ne doit pas être inférieur à la date d'aujourd'hui et doit être le format d-m-Y");
-            // }
+            if (isset($errors['dateEvent.date'])) {
+                ($this->c->get('logger.error'))->error("error: invalid input", $errors['dateEvent.date']);
+                return Writer::json_error($resp, 403, "La date de réunion ne doit pas être inférieur à la date d'aujourd'hui et doit être le format d-m-Y");
+            }
             if (isset($errors['lieu'])) {
                 ($this->c->get('logger.error'))->error("error: invalid input", $errors['lieu']);
                 return Writer::json_error($resp, 403, "Le champ lieu ne doit pas être vide");
@@ -99,11 +99,9 @@ class EventController
                 ['id' => $ev->id]
             );
             $event["event"] = $ev;
-            $event["links"] =  $eventPath; //!bonne idée de mettre ça ? 
+            $event["links"] =  $eventPath;
             array_push($event_response, $event);
         }
-
-
         //Construction des donnés à retourner dans le corps de la réponse
         $data_resp = [
             "type" => "collection",
@@ -111,8 +109,7 @@ class EventController
             "events" => $event_response
         ];
 
-        $resp->getBody()->write(json_encode($data_resp));
-        return writer::json_output($resp, 200);
+       return writer::json_output($resp, 200, $data_resp );
     }
 
 

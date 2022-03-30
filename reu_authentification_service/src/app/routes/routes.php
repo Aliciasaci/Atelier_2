@@ -22,9 +22,6 @@ $app->post('/invitations[/]',ParticipationController::class.':createInvitation')
 //Get toutes les participations positives à un certain évènement
 $app->get('/events/participations/{id}[/]',ParticipationController::class. ':getParByIdEvent')->setName('getParByIdEvent')->add(Middleware::class.':putIntoJson');
 
-//Get toutes les participations négative à un certain évènement
-$app->get('/events/non_participations/{id}[/]',ParticipationController::class. ':getNonParByIdEvent')->setName('getNonParByIdEvent')->add(Middleware::class.':putIntoJson');
-
 //Get toutes les évènement auquelles un user a été invité
 $app->get('/users/{id}/invitations/[/]',ParticipationController::class. ':getInvitationsByUserId')->setName('getInvitationsByUserId')->add(Middleware::class.':putIntoJson');
 

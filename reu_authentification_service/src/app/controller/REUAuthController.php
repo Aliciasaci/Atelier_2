@@ -66,7 +66,7 @@ class REUAuthController //extends Controller
                 'iss' => 'http://api.authentification.local/auth',
                 'aud' => 'http://api.backoffice.local',
                 'iat' => time(),
-                'exp' => time() + (12 * 30 * 24),  //validité 30 jours
+                'exp' => time() + (12 * 60 * 24 * 3600),  //validité 30 jours
                 'upr' => [
                     'user_id' => $user->id,
                     'email' => $user->email,
@@ -92,7 +92,7 @@ class REUAuthController //extends Controller
     {
 
         $date_now = new  \DateTime();
-        $date_12month = date('Y-m-d H:i:s', strtotime("+12 months", strtotime($user['last_connected'])));
+        $date_12month = date('Y-m-d H:i:s', strtotime("+12 months", strtotime($user['updated_at'])));
 
         $temp = date_diff(new \DateTime($date_12month), $date_now)->format('%R');
         if ($temp === '+') {
@@ -244,32 +244,12 @@ class REUAuthController //extends Controller
                 $user->save();
 
 
-                //Lui crée un access token et refresh token.
-                $secret = $this->container->settings['secret'];
-                $token = JWT::encode(
-                    [
-                        'iss' => 'http://api.authentification.local/auth',
-                        'aud' => 'http://api.backoffice.local',
-                        'iat' => time(),
-                        'exp' => time() + (12 * 30 * 24),  //validité 30 jours
-                        'upr' => [
-                            'user_id' => $user->id,
-                            'username' => $user->username,
-                        ]
-                    ],
-                    $secret,
-                    'HS512'
-                );
-
-                $user->refresh_token = bin2hex(random_bytes(32));
                 $user->save();
                 $response = [
                     "visiteur" => [
                         "id" => $user->id,
                         "role" => $user->role,
                         "username" => $user->username,
-                        'token' =>  $token,
-                        'refresh_token' => $user->refresh_token
                     ]
                 ];
                 return Writer::json_output($resp, 200, $response);

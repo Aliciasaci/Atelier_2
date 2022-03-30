@@ -7,8 +7,8 @@
         >
       </div>
 
-      <div id="navbarBasicExample" class="navbar-menu" v-if="this.$store.state.member.role == 100">
-        <div class="navbar-start">
+      <div id="navbarBasicExample" class="navbar-menu" >
+        <div class="navbar-start" v-if="this.$store.state.member.role == 100">
           <router-link class="navbar-item" to="/Accueil"><i class="fa-solid fa-calendar-check mr-2"></i>Mes évènements </router-link>
           <router-link class="navbar-item" to="/ProfilUser"><i class="fa-solid fa-user-tie mr-2"></i> Mon profil </router-link>
           <router-link class="navbar-item" to="/Invitations"><i class="fa-solid fa-bell mr-2"></i>Invitations</router-link>
@@ -16,7 +16,9 @@
 
         <div class="navbar-end">
           <div class="navbar-item">
-            <div class="buttons">
+            <div class="navbar-item" v-if="this.$store.state.member.role == 100 || this.$store.state.member.role == 200"><p class="header-item header-connect">Connecté(e) en tant que <b class="header-item"> {{$store.state.member.username}}</b></p></div>
+            <div class="navbar-item" v-if="this.$store.state.member.role == 0"><p class="header-item header-connect">Vous naviguez en tant que <b class="header-item"> {{$store.state.member.username}}</b></p></div>
+            <div class="buttons" v-if="this.$store.state.member.role == 100 || this.$store.state.member.role == 200">
               <router-link to="/logOut" class="button is-dark is-small"> Se déconnecter </router-link>
             </div>
           </div>
@@ -47,7 +49,7 @@ export default {};
 
 .navbar-start {
   position: absolute;
-  left: 30%;
+  left: 25%;
   top: 15%;
   font-family: "Poppins", sans-serif;
 }
@@ -60,5 +62,10 @@ export default {};
 img {
   width: 80%;
 }
+/* .header-connect{
+    position: absolute;
+    top: 15%;
+    margin-right: 20%;
+} */
 @import url("https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Alegreya+Sans:wght@300&family=Cormorant+Garamond:wght@300;600&family=Lora:wght@500&family=Old+Standard+TT&family=Pacifico&family=Poppins&family=Roboto+Mono:wght@500&family=Roboto:wght@300;400&family=Space+Mono&display=swap");
 </style>

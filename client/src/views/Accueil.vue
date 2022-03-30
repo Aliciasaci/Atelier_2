@@ -45,7 +45,7 @@
                   <button
                     class="button is-info is-light btn-footer js-modal-trigger"
                     data-target="inviter"
-                    @click="showModalInvite()"
+                    @click="showModalInvite(event.id)"
                   >Inviter</button>
                   <button
                     class="button is-black is-light btn-footer js-modal-trigger"
@@ -74,7 +74,7 @@
                       <p class="subtitle is-6">{{ search_results.email }}</p>
                       <button
                         class="button is-success is-light"
-                        @click="createInvitation(event.id)"
+                        @click="createInvitation()"
                       >Envoyer</button>
                     </div>
                     <div v-if="search_message" class="box search-result mt-2">
@@ -138,12 +138,14 @@ export default {
       eventLink: "http://localhost:8080/DetailEvent/", //!changer ça pour le server de docketu
       search_results: null,
       search_message: "",
+      invitation:null,
     };
   },
   mounted() {
     this.$api
       .get(`events/creators/${this.$store.state.member.id}`)
       .then((response) => {
+        console.log(response.data.event);
         this.events = response.data.event;
       })
       .catch((error) => {
@@ -190,7 +192,8 @@ export default {
       this.search_results = null;
       this.search_message = null;
     },
-    showModalInvite() {
+    showModalInvite(idEvent) {
+      this.invitation = idEvent;
       this.showModalFlagI = true;
     },
     cancelModalInvite() {
@@ -207,14 +210,13 @@ export default {
       this.showModalFlagL = false;
       this.eventLink = "http://localhost:8080/DetailEvent/";
     },
-    createInvitation(idEvent) {
-      if (idEvent && this.search_results.id) {
-        console.log(idEvent);
+    createInvitation() {
+      if (this.invitation && this.search_results.id) {
         console.log(this.search_results.id);
         this.$api
           .post("invitations/",
             {
-              idEvent: idEvent,
+              idEvent: this.invitation,
               idUser: this.search_results.id,
               response: ""
             }

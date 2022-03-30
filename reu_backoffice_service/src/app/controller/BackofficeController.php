@@ -235,23 +235,6 @@ class backofficeController
         return $resp;
     }
 
-    //récupèrer les users qui ont dit non à une invitations
-    public function getNonParByIdEvent(Request $req, Response $resp, array $args): Response
-    {
-        $id_event = $args['id'] ?? null;
-
-        $client = new \GuzzleHttp\Client([
-            'base_uri' => $this->c->get('settings')['auth_service'],
-            'timeout' => 5.0
-        ]);
-
-        $response = $client->request('GET', '/events/non_participations/' . $id_event);
-
-        $resp = $resp->withStatus($response->getStatusCode())->withHeader('Content-Type', $response->getHeader('Content-Type'))
-            ->withBody($response->getBody());
-        return $resp;
-    }
-
     //récupérer toutes les invitations d'un user
     public function getInvitationsByUserId(Request $req, Response $resp, array $args): Response
     {

@@ -74,40 +74,19 @@ class ParticipationController //extends Controller
         }
     }
 
-    //Get tous les users qui ont dit oui à une invitation
-    public function getParByIdEvent(Request $req, Response $resp, array $args): Response  //! revoir les vérifications etc 
+    //Get tous les users qui ont dit non à une invitation
+    public function getParByIdEvent(Request $req, Response $resp, $args): Response
     {
         $id_event = $args['id'] ?? null;
-        $participations = Participant::select(['id', 'idEvent', 'idUser', 'response'])->where('idEvent', '=', $id_event)->where('response', '=', 'oui')->get();
-
-        $users = [];
-        foreach ($participations as $part) {
-            $user = User::select('id', 'username', 'email')->where('id', '=', $part->idUser)->get();
-            array_push($users, $user);
+        try {
+            $participations = Participant::select(['id', 'idEvent', 'idUser', 'response'])->where('idEvent', '=', $id_event)->where('response', '!=', '')->get();
+            $response = [
+                "resultat" => $participations,
+            ];
+            return Writer::json_output($resp, 200, $response);
+        } catch (ModelNotFoundException $e) {
+            return Writer::json_error($resp, 404, "not found user");
         }
-        $data_resp = [
-            "participations" => $users
-        ];
-
-        return Writer::json_output($resp, 200, $data_resp);
-    }
-
-    //Get tous les users qui ont dit non à une invitation
-    public function getNonParByIdEvent(Request $req, Response $resp, $args): Response  //! revoir les vérifications etc 
-    {
-        $id_event = $args['id'];
-        $participations = Participant::select(['id', 'idEvent', 'idUser', 'response'])->where('idEvent', '=', $id_event)->where('response', '=', 'non')->get();
-
-        $users = [];
-        foreach ($participations as $part) {
-            $user = User::select('id', 'username', 'email')->where('id', '=', $part->idUser)->get();
-            array_push($users, $user);
-        }
-        $data_resp = [
-            "participations" => $users
-        ];
-
-        return Writer::json_output($resp, 200, $data_resp);
     }
 
     //Get toutes les invitations reçus par un user
@@ -115,7 +94,7 @@ class ParticipationController //extends Controller
     {
         $id_user = $args['id'];
         if ($id_user) {
-            $invitations = Participant::select(['id', 'idEvent', 'idUser', 'response'])->where('idUser', '=', $id_user)->where('response', '=',"")->get();
+            $invitations = Participant::select(['id', 'idEvent', 'idUser', 'response'])->where('idUser', '=', $id_user)->where('response', '=', "")->get();
             $data_resp = [
                 "type" => "collection",
                 "invitations" => $invitations,
@@ -137,7 +116,7 @@ class ParticipationController //extends Controller
      */
     public function updateInvitation(Request $req, Response $resp, array $args): Response
     {
-        $response= $req->getParsedBody()['response']  ?? null;
+        $response = $req->getParsedBody()['response']  ?? null;
         $id_invitation = $args['id'] ?? null;
 
         if (!isset($id_invitation)) {

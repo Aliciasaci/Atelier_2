@@ -51,6 +51,12 @@ const routes = [{
         component: () =>
             import ('../views/LogOut.vue')
     },
+    {
+        path: '/BackOffice/',
+        name: 'BackOffice',
+        component: () =>
+            import ('../views/BackOffice.vue')
+    },
 ]
 
 const router = new VueRouter({

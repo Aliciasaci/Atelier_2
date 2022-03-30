@@ -6,6 +6,8 @@
         <div class="columns is-centered">
           <div class="column is-6-tablet is-5-desktop is-10-widescreen">
             <h4 class="title is-5 has-text-centered mb-20">Mon profil</h4>
+            <div class="box" v-if="error_message"><p class="error_message">{{error_message}}</p></div>
+            <div class="box .success_message" v-if="success_message"><p class="success_message">{{success_message}}</p></div>
             <div class="card mb-6 first-card">
               <div class="card-content">
                 <div class="media">
@@ -15,13 +17,13 @@
                     </figure>
                   </div>
                   <div class="media-content">
-                    <p class="title is-4 principal">{{input_unsername}}</p>
-                    <p class="subtitle is-6">{{input_email}}</p>
+                    <p class="title is-4 principal">{{ input_unsername }}</p>
+                    <p class="subtitle is-6">{{ input_email }}</p>
                   </div>
                 </div>
 
                 <div class="content ml-4">
-                  {{input_description}}
+                  {{ input_description }}
                   <br />
                   <time datetime="2016-1-1">
                     <b>a rejoins le :</b>
@@ -155,11 +157,15 @@
                         <button
                           class="button is-link is-outlined mr-2"
                           @click="enableModification"
-                        >Modifier</button>
+                        >
+                          Modifier
+                        </button>
                         <button
                           class="button is-primary is-outlined"
                           @click="ModifyInformations"
-                        >Sauvegarder</button>
+                        >
+                          Sauvegarder
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -185,9 +191,11 @@ export default {
       input_date_naissance: "",
       input_tel: "",
       user_informations: "",
-    }
+      error_message: "",
+      success_message: "",
+    };
   },
-  mounted(){
+  mounted() {
     this.loadUserInformations();
   },
   methods: {
@@ -201,7 +209,7 @@ export default {
           console.log(response.data);
           this.user_informations = response.data;
 
-          //Remettre les nouvelles valeurs dans les champs : 
+          //Remettre les nouvelles valeurs dans les champs :
           this.input_unsername = response.data.result.username;
           this.input_email = response.data.result.email;
           this.input_sexe = response.data.result.sexe;
@@ -216,25 +224,42 @@ export default {
         });
     },
     ModifyInformations() {
-      this.$api
-        .put(`users/${this.$store.state.member.id}/informations`, {
-          username: this.input_unsername,
-          email: this.input_email,
-          description: this.input_description,
-          sexe: this.input_sexe,
-          tel: this.input_tel,
-          dn: this.input_date_naissance
-        })
-        .then((response) => {
-          console.log(response.data.user);
-          //Recharger les informations du user après modification
-          this.loadUserInformations();
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    }
-  }
+      let stringIsDate = (string) => /\d\d\d\d\/\d\d\/\d\d/.test(string);
+      let stringIsTel = (string) => /0\d{9}/.test(string);
+      if (stringIsDate(this.input_date_naissance)) {
+        if (stringIsTel(this.input_tel)) {
+          this.$api
+            .put(`users/${this.$store.state.member.id}/informations`, {
+              username: this.input_unsername,
+              email: this.input_email,
+              description: this.input_description,
+              sexe: this.input_sexe,
+              tel: this.input_tel,
+              dn: this.input_date_naissance,
+            })
+            .then((response) => {
+              console.log(response.data.user);
+              this.success_message = "Les modifications ont été effectuées avec succés"
+              //Si le user choisit de modifier l'email, lui demander de se reconnecter avec la nouvelle @
+              if (this.input_email != this.$store.state.member.email) {
+                this.$store.commit("setToken", false);
+                this.$store.commit("setMember", false);
+              } else {
+                 //Recharger les informations du user après modification
+                this.loadUserInformations();
+              }
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        } else {
+          this.error_message= "Numéro de téléphone invalide"
+        }
+      } else {
+        this.error_message= "Date de naissance invalide, Veuillez saisir une date de ce format jj-mm-yyy"
+      }
+    },
+  },
 };
 </script>
 
@@ -254,5 +279,13 @@ export default {
 }
 .label {
   text-align: left;
+}
+.error_message {
+  text-align: center;
+  color : red;
+}
+.success_message {
+    text-align: center;
+  color : green;
 }
 </style>
