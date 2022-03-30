@@ -1,11 +1,20 @@
 export const Outils = {
     methods: {
         avatar(member) {
-            return `https://eu.ui-avatars.com/api/?name=${
+            if (member.email) {
+                return `https://eu.ui-avatars.com/api/?name=${
         member.username
       }&rounded=true&bold=true&format=svg&background=${this.stringToColour(
         member.email
-      )}`;
+      )}`
+            } else {
+                let email = "visiteur@gmail.com"
+                return `https://eu.ui-avatars.com/api/?name=${
+            member.username
+          }&rounded=true&bold=true&format=svg&background=${this.stringToColour(
+            email
+          )}`
+            };
         },
         stringToColour(str) {
             var hash = 0;

@@ -15,6 +15,7 @@ export default new Vuex.Store({
         token: "",
         member: false,
         invitations: [],
+        token_visiteur: ""
     },
     getters: {},
     mutations: {
@@ -23,7 +24,9 @@ export default new Vuex.Store({
         },
         setToken(state, token) {
             state.token = token;
-            console.log(state.token);
+        },
+        setTokenVisiteur(state, token_visiteur) {
+            state.token_visiteur = token_visiteur;
         },
         setMember(state, member) {
             state.member = member;

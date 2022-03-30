@@ -47,53 +47,8 @@
               Pas encore inscrit ?
               <router-link class="is-text" to="/SingnIn">S'inscrire</router-link>
             </div>
-            <div>
-              <div class="box">
-                <p class="is-text invite-text" data-target="inviter" @click="showModalInvite()">
-                  <u>Continuer en tant qu'invité</u>
-                </p>
-              </div>
-            </div>
           </div>
         </div>
-      </div>
-    </div>
-    <!-- Modal !-->
-    <div id="inviter" class="modal" :class="{ 'is-active': showModalFlagI }">
-      <div class="modal-background"></div>
-      <div class="modal-card">
-        <header class="modal-card-head">
-          <p class="modal-card-title is-5">Accéder à votre évènement</p>
-          <button class="delete" aria-label="close" @click="cancelModalInvite"></button>
-        </header>
-        <section class="modal-card-body ml-0.5">
-          <p>
-            <b>URL</b>
-          </p>
-          <input
-            class="input is-link"
-            type="url"
-            placeholder="Veuillez saisir l'url de l'évènement"
-            v-model="input_link_inviter"
-            required
-          />
-        </section>
-        <section class="modal-card-body ml-0.5">
-          <p>
-            <b>Pseudo</b>
-          </p>
-          <input
-            class="input is-link"
-            type="text"
-            placeholder="Veuillez saisir votre username"
-            v-model="username_visiter"
-            required
-          />
-        </section>
-        <footer class="modal-card-foot">
-          <button class="button ml-2 is-link is-outlined" @click="createInstanceVisiter">Accéder</button>
-          <button class="button ml-2 is-black is-outlined">Effacer</button>
-        </footer>
       </div>
     </div>
   </section>
@@ -106,9 +61,6 @@ export default {
       email: "",
       password: "",
       responseMessage: "",
-      showModalFlagI: false,
-      input_link_inviter: "",
-      username_visiter: "",
     }
   },
   methods: {
@@ -133,36 +85,6 @@ export default {
           this.responseMessage = "Email ou mots de passe incorrecte";
         });
     },
-    /*Lorsqu'un visiteur insére son nom, une instance contenant un ID, username et level = 0 lui est crée en base de donnée,
-    *il est ensuite redirigé vers l'URL en question
-    */
-    //!vérifie que l'url existe bel est bien (si t'as le temps)
-    createInstanceVisiter() {
-      if (this.username_visiter) {
-        this.$api
-          .post("visiteurs", {
-            username: this.username_visiter,
-          }).then(response => {
-            console.log(response)
-            this.$store.commit("setToken", response.data.visiteur.token);
-            this.$store.commit("setMember", response.data.visiteur);
-            console.log(this.$store.state.member);
-            this.goToLink();
-          })
-      }
-    },
-    showModalInvite() {
-      this.showModalFlagI = true;
-    },
-    cancelModalInvite() {
-      this.showModalFlagI = false;
-    },
-    goToLink() {
-      if (this.input_link_inviter) {
-        let route = this.input_link_inviter.slice(21);       //!modifier ça avec la taille du serveur de docketu
-        this.$router.push(route);
-      }
-    }
   }
 
 };

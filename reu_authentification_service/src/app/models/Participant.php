@@ -1,6 +1,5 @@
 <?php
 namespace reu\authentification\app\models;
-use \Illuminate\Database\Eloquent\Model as EloquentModel;
 
 class Participant extends \Illuminate\Database\Eloquent\Model {
 

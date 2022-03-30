@@ -5,11 +5,7 @@ class Comment extends \Illuminate\Database\Eloquent\Model {
 
     protected $table      = 'comments'; 
     protected $primaryKey = 'id';
-    public  $incrementing = true;   
- 
-    public function items() {
-       return $this->hasMany('\reu\comments\app\models\Comment', 'id');
-    }
- 
+    public  $incrementing = false;
+    public $keyType='string';     
  
 } 

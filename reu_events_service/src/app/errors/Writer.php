@@ -25,10 +25,14 @@ class Writer extends \Exception{
 
     }
 
-    public static function json_output(Response $resp, int $code_resp) : Response {
+    public static function json_output(Response $rs, int $status, array $data = []) : Response {
+        $data_json = json_encode($data);
+        
+        $rs = $rs->withStatus($status);
+        $rs = $rs->withHeader('Content-Type', 'application/json;charset=utf-8');
 
-        $resp = $resp->withStatus($code_resp);
-        return $resp;
+        $rs->getBody()->write($data_json);
 
+        return $rs;
     }
 }

@@ -13,8 +13,13 @@ Vue.prototype.$api = new axios.create({
 });
 
 Vue.prototype.$api.interceptors.request.use(function(config) {
-    if (store.state.token) {
+    //Authorization d'un user connecté
+    if (store.state.token && (store.state.member.role == 100 || store.state.member.role == 200)) {
         config.headers.Authorization = `Bearer ${store.state.token}`
+    }
+    //Authorization d'un visiteur
+    if (store.state.token_visiteur) {
+        config.headers.Authorization = `Bearer ${store.state.token_visiteur}`
     }
     return config;
 });

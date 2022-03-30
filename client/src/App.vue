@@ -18,14 +18,22 @@ export default {
   },
   mounted() {
     this.$store.commit("setReady", true);
-    // si le token n'est pas présent renvoyer vers la connexion
-    if (!this.$store.state.token) {
+    this.$store.commit("setTokenVisiteur", false);
+
+    // si le access token n'est pas présent renvoyer vers la connexion
+    if (!this.$store.state.token && !this.$store.state.member.role == 100) {
       this.seConnecter();
+    }
+
+    // si c'est un admin alors renvoyer vers la page Backoffice
+    if (!this.$store.state.token && !this.$store.state.member.role == 200) {
+           this.seConnecter();
     } else {
-      if(this.$store.state.member.role == 100){   //empêcher un inviter d'accéder à l'Acceuil
-        this.$router.push("/Accueil");
+      if(this.$store.state.member.role == 200){
+       this.$router.push("/BackOffice");
       }
     }
+
   },
   methods: {
     seConnecter() {
