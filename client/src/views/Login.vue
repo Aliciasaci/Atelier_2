@@ -78,7 +78,11 @@ export default {
         .then((response) => {
           this.$store.commit("setToken", response.data.token);
           this.$store.commit("setMember", response.data.user);
+          if(this.$store.state.member.role == 100){
           this.$router.push("Accueil");
+          }else{
+          this.$router.push("BackOffice");
+          }
         })
         .catch((error) => {
           console.log(error);

@@ -1,50 +1,31 @@
 <template>
     <section>
-        <div class="column">
-            <div class="box">
-                <h4 id="oui-par" class="title is-6 title-chat has-text-centered">Ils ont dit Oui</h4>
-                <div class="box" v-for="p in participants" :key="p.id">
-                    <span v:bind-value="getCommentAuthorInformation">
-                        <i class="fa-solid fa-check mr-2"></i>
-                        {{ p.username }} - {{ p.email }}
-                    </span>
-                </div>
-            </div>
-        </div>
+         <p>{{ username }} - {{ email }}</p>     
     </section>
 </template>
 <script>
 export default {
-    props: ["participants"],
+    props: ["participant"],
     data() {
         return {
-            // id_author: this.commentaire.idUser,
-            // author: {
-            //     username: "",
-            //     email: "",
-            // }
+            username: "",
+            email : "",
         }
     },
     mounted() {
-        console.log(this.participants);
+        if (this.participant) {
+                this.$api
+                    .get(`users/${this.participant}`)
+                    .then((response) => {
+                        console.log(response);
+                        this.username = response.data.result.username;
+                        this.email = response.data.result.email;
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                    });
+            }
     },
-    methods: {
-        getCommentAuthorInformations() {
-            //Récupèrer les infos des auteurs de chacuns des commentaires
-            console.log("ici");
-            // if (this.id_author) {
-            //     this.$api
-            //         .get(`users/${this.id_author}`)
-            //         .then((response) => {
-            //             this.author.username = response.data.result.username;
-            //             this.author.email = response.data.result.email;
-            //         })
-            //         .catch((error) => {
-            //             console.log(error);
-            //         });
-            // }
-        }
-    }
 }
 </script>
 

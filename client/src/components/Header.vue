@@ -18,6 +18,9 @@
           <div class="navbar-item">
             <div class="navbar-item" v-if="this.$store.state.member.role == 100 || this.$store.state.member.role == 200"><p class="header-item header-connect">Connecté(e) en tant que <b class="header-item"> {{$store.state.member.username}}</b></p></div>
             <div class="navbar-item" v-if="this.$store.state.member.role == 0"><p class="header-item header-connect">Vous naviguez en tant que <b class="header-item"> {{$store.state.member.username}}</b></p></div>
+             <div class="buttons" v-if="this.$store.state.token_visiteur">
+              <button class="button is-dark is-small is-text" @click="deleteInvit"> Je ne veux plus être invité </button>
+            </div>
             <div class="buttons" v-if="this.$store.state.member.role == 100 || this.$store.state.member.role == 200">
               <router-link to="/logOut" class="button is-dark is-small"> Se déconnecter </router-link>
             </div>
@@ -28,8 +31,21 @@
   </section>
 </template>
 
-<script>
-export default {};
+<script>import router from "@/router";
+
+export default {
+  methods :{
+    deleteInvit(){
+      if(confirm("Attention, si vous décidez de quitter, vous ne pourrez plus avoir accès aux informations de cet évènement")){
+        if (this.$store.state.token_visiteur) {
+        this.$store.commit("setTokenVisiteur", false);
+        this.$store.commit("setMember", false);
+        router.push('/');
+       }
+      }
+    }
+  }
+};
 </script>
 
 <style style="scss">

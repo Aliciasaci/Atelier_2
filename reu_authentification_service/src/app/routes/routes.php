@@ -19,7 +19,7 @@ $app->delete('/users[/]',REUAuthController::class.':delete')->setName('delete')-
 //Créer une invitation
 $app->post('/invitations[/]',ParticipationController::class.':createInvitation')->setName('createInvitation')->add(Middleware::class.':putIntoJson');
 
-//Get toutes les participations positives à un certain évènement
+//Get toutes les participations à un certain event
 $app->get('/events/participations/{id}[/]',ParticipationController::class. ':getParByIdEvent')->setName('getParByIdEvent')->add(Middleware::class.':putIntoJson');
 
 //Get toutes les évènement auquelles un user a été invité

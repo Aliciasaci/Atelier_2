@@ -17,7 +17,7 @@ $app->get('/events/creators/{id}[/]',BackofficeController::class. ':getEventById
 //Get un certain event par id
 $app->get('/events/{id}[/]',BackofficeController::class. ':getOneEvent')->setName('getOneEvent')->add(Middleware::class.':putIntoJson')->add(Middleware::class. ':check');
 
-// Get un certain event par id 
+// delete un certain event par id 
 $app->delete('/events/{id}[/]',BackofficeController::class. ':deleteEventById')->setName('deleteEventById')->add(Middleware::class.':putIntoJson')->add(Middleware::class. ':check');
 
 //Get tous les events
@@ -26,14 +26,11 @@ $app->get('/events[/]',BackofficeController::class. ':getEvents')->setName('getE
 //Créer un event
 $app->post('/events[/]',BackofficeController::class. ':createEvent')->setName('createEvent')->add(Middleware::class.':putIntoJson')->add(Middleware::class. ':check');
 
-//Créer une participation
+//Créer une invitation 
 $app->post('/invitations[/]',BackofficeController::class. ':createInvitation')->setName('createInvitation')->add(Middleware::class.':putIntoJson')->add(Middleware::class. ':check');
 
-//Get les users qui ont dit oui à un certain event par id
+//get les invitations auquelles un utilisateur a répondu
 $app->get('/events/participations/{id}[/]',BackofficeController::class. ':getParByIdEvent')->setName('getParByIdEvent')->add(Middleware::class.':putIntoJson')->add(Middleware::class. ':check');
-
-//Get les users qui ont dit non à un certain event par id
-// $app->get('/events/non_participations/{id}[/]',BackofficeController::class. ':getNonParByIdEvent')->setName('getNonParByIdEvent')->add(Middleware::class.':putIntoJson')->add(Middleware::class. ':check');
 
 //Get les invitations d'un certain user par son id
 $app->get('/users/{id}/invitations[/]',BackofficeController::class. ':getInvitationsByUserId')->setName('getInvitationsByUserId')->add(Middleware::class.':putIntoJson')->add(Middleware::class. ':check');

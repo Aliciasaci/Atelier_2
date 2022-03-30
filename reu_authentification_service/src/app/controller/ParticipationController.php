@@ -79,7 +79,7 @@ class ParticipationController //extends Controller
     {
         $id_event = $args['id'] ?? null;
         try {
-            $participations = Participant::select(['id', 'idEvent', 'idUser', 'response'])->where('idEvent', '=', $id_event)->where('response', '!=', '')->get();
+            $participations = Participant::select(['id', 'idEvent', 'idUser', 'response'])->where('idEvent', '=', $id_event)->where('response', '<>', '')->get();
             $response = [
                 "resultat" => $participations,
             ];

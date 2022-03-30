@@ -24,27 +24,27 @@ class EventController
     public function insertEvent(Request $req, Response $resp, array $args): Response
     {
         $received_event = $req->getParsedBody();
-            $errors = $req->getAttribute('errors') ?? null;
-            if (isset($errors['titre'])) {
-                ($this->c->get('logger.error'))->error("error: invalid input", $errors['titre']);
-                return Writer::json_error($resp, 403, "Le champ 'titre' ne doit pas être vide");
-            }
-            if (isset($errors['description'])) {
-                ($this->c->get('logger.error'))->error("error: invalid input", $errors['description']);
-                return Writer::json_error($resp, 403, "Le champ 'description' ne doit pas être vide et doit être valide");
-            }
-            if (isset($errors['dateEvent.date'])) {
-                ($this->c->get('logger.error'))->error("error: invalid input", $errors['dateEvent.date']);
-                return Writer::json_error($resp, 403, "La date de réunion ne doit pas être inférieur à la date d'aujourd'hui et doit être le format d-m-Y");
-            }
-            if (isset($errors['lieu'])) {
-                ($this->c->get('logger.error'))->error("error: invalid input", $errors['lieu']);
-                return Writer::json_error($resp, 403, "Le champ lieu ne doit pas être vide");
-            }
-            if (isset($errors['idCreateur'])) {
-                ($this->c->get('logger.error'))->error("error", $errors['idCreateur']);
-                return Writer::json_error($resp, 403, "invalid idCreateur");
-            }
+        $errors = $req->getAttribute('errors') ?? null;
+        if (isset($errors['titre'])) {
+            ($this->c->get('logger.error'))->error("error: invalid input", $errors['titre']);
+            return Writer::json_error($resp, 403, "Le champ 'titre' ne doit pas être vide");
+        }
+        if (isset($errors['description'])) {
+            ($this->c->get('logger.error'))->error("error: invalid input", $errors['description']);
+            return Writer::json_error($resp, 403, "Le champ 'description' ne doit pas être vide et doit être valide");
+        }
+        if (isset($errors['dateEvent.date'])) {
+            ($this->c->get('logger.error'))->error("error: invalid input", $errors['dateEvent.date']);
+            return Writer::json_error($resp, 403, "La date de réunion ne doit pas être inférieur à la date d'aujourd'hui et doit être le format d-m-Y");
+        }
+        if (isset($errors['lieu'])) {
+            ($this->c->get('logger.error'))->error("error: invalid input", $errors['lieu']);
+            return Writer::json_error($resp, 403, "Le champ lieu ne doit pas être vide");
+        }
+        if (isset($errors['idCreateur'])) {
+            ($this->c->get('logger.error'))->error("error", $errors['idCreateur']);
+            return Writer::json_error($resp, 403, "invalid idCreateur");
+        }
         try {
             //Création du token unique et cryptographique
             $token_event = random_bytes(32);
@@ -109,7 +109,7 @@ class EventController
             "events" => $event_response
         ];
 
-       return writer::json_output($resp, 200, $data_resp );
+        return writer::json_output($resp, 200, $data_resp);
     }
 
 
@@ -122,16 +122,6 @@ class EventController
                 ->where('id', '=', $id_event)
                 ->firstOrFail();
 
-
-            // $commandePath = $this->c->router->pathFor(
-            //     'getEvent',
-            //     ['id' => $id_event]
-            // );
-
-            // Création des liens hateos
-            // $hateoas = [
-            //     "self" => ["href" => $commandePath]
-            // ];
 
             // Création du body de la réponse
             $datas_resp = [
@@ -211,37 +201,30 @@ class EventController
     public function deleteEventsExpired(Request $req, Response $resp, array $args): Response
     {
         $listIdEvents = Event::select(['id'])->get();
+        try {
+            foreach ($listIdEvents as $idEvent) {
+                $event = Event::find($idEvent->id);
 
-        $body = [
-            'lenght' => 0,
-            'events' => []
-        ];
+                $date_now = new  DateTime();
+                $date_6months = date('Y-m-d H:i:s', strtotime("+6 months", strtotime($event['updated_at'])));
 
-        foreach ($listIdEvents as $idEvent) {
-            $event = Event::find($idEvent->id);
+                $date_convert = new DateTime($date_6months);
+                $diff = date_diff($date_now, $date_convert)->format('%R');
 
-            $date_now = new  DateTime();
-            $date_6months = date('Y-m-d H:i:s', strtotime("+6 months", strtotime($event['dateEvent'])));
-            $date_convert = new DateTime($date_6months);
-
-
-            $diff = date_diff($date_now, $date_convert)->format('%R');
-            if ($diff == '-') {
-                $event->delete();
-                $res = "event deleted";
-            } else
-                $res = "can't delete event, not expired yet";
-
-
-            $response =  [
-                'status' => $res,
-                'event'  => $event
-            ];
-            array_push($body['events'], $response);
+             try{
+                if ($diff == "-") {
+                    $event->delete();
+                    $data_resp = [
+                        "message" =>  "events deleted",
+                    ];
+                    return writer::json_output($resp, 200, $data_resp);
+                }}catch(ModelNotFoundException $e){
+                    return writer::json_error($resp, 404, "no events found");
+                }
+            }
+        } catch (ModelNotFoundException $e) {
+            return writer::json_error($resp, 404, "no events found");
         }
-
-        $resp->getBody()->write(json_encode($body));
-        return writer::json_output($resp, 200);
     }
 
 

@@ -22,21 +22,20 @@
                   <p class="title event is-5">{{ event.titre }}</p>
                 </router-link>
 
-                <p class="content">{{ event.description }}</p>
+                <p class="content mt-2">{{ event.description }}</p>
                 <p class="subtitle event is-6">
                   <b>Organisateur :</b>
                   {{ $store.state.member.username }}
                 </p>
                 <p class="subtitle event is-6">
                   <b>Adresse :</b>
-                  {{ event.lieu }}
+                  {{ event.lieu }}<br/>
                   <b>Le :</b>
                   <time datetime="2016-1-1">{{ event.dateEvent }}</time>
                 </p>
               </div>
               <div class="card">
                 <footer class="card-footer">
-                  <button class="button is-warning is-light btn-footer">Modifier</button>
                   <button
                     class="button is-danger is-light btn-footer js-modal-trigger"
                     data-target="supprimer"
@@ -234,7 +233,7 @@ export default {
   font-family: "Poppins", sans-serif;
 }
 .btn-footer {
-  margin: 10px 0em 10px 3em;
+  margin: 10px 0em 10px 5em;
   width: 5em;
 }
 .event {

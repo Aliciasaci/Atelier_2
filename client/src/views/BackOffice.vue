@@ -48,6 +48,9 @@ export default {
                 .delete(`users/`)
                 .then((response) => {
                     console.log(response);
+                    if (response.status == 200) {
+                        alert("Les comptes ont été supprimés avec succès");
+                    }
                 })
                 .catch((error) => {
                     console.log(error);
@@ -57,7 +60,9 @@ export default {
             this.$api
                 .delete(`events/`)
                 .then((response) => {
-                    console.log(response);
+                     if (response.status == 200) {
+                        alert("Les évènements ont été supprimés avec succès");
+                    }
                 })
                 .catch((error) => {
                     console.log(error);

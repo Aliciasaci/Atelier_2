@@ -66,7 +66,7 @@ class REUAuthController //extends Controller
                 'iss' => 'http://api.authentification.local/auth',
                 'aud' => 'http://api.backoffice.local',
                 'iat' => time(),
-                'exp' => time() + (12 * 60 * 24 * 3600),  //validité 30 jours
+                'exp' => time() + (30 * 24 * 3600),
                 'upr' => [
                     'user_id' => $user->id,
                     'email' => $user->email,
@@ -88,25 +88,9 @@ class REUAuthController //extends Controller
         return Writer::json_output($rs, 200, $data);
     }
 
-    public function deleteUser($user)
-    {
-
-        $date_now = new  \DateTime();
-        $date_12month = date('Y-m-d H:i:s', strtotime("+12 months", strtotime($user['updated_at'])));
-
-        $temp = date_diff(new \DateTime($date_12month), $date_now)->format('%R');
-        if ($temp === '+') {
-            $user->delete();
-            return $user;
-        } else {
-            return false;
-        }
-    }
-
     //role 100 représente un user qui possède un compte
     //un role 200 représente un user admin
     //un role 0 représente un visiteur qui ne possède pas de compte
-
     public function create(Request $req, Response $resp, array $args): Response
     {
         $data = $req->getParsedBody() ?? null;
@@ -174,7 +158,7 @@ class REUAuthController //extends Controller
                 }
             }
 
-            $resp = $resp->withStatus(201);
+            $resp = $resp->withStatus(200);
             $body = json_encode([
                 "lenghth" => count($json),
                 "users" => $json,
@@ -191,6 +175,22 @@ class REUAuthController //extends Controller
         $resp->getBody()->write($body);
         return $resp;
     }
+    
+    public function deleteUser($user)
+    {
+
+        $date_now = new  \DateTime();
+        $date_12month = date('Y-m-d H:i:s', strtotime("+12 months", strtotime($user['updated_at'])));
+
+        $temp = date_diff(new \DateTime($date_12month), $date_now)->format('%R');
+        if ($temp === '+') {
+            $user->delete();
+            return $user;
+        } else {
+            return false;
+        }
+    }
+
 
     //Rechercher un user par son psuedo ou e-mail
     public function searchUser(Request $req, Response $resp, array $args): Response

@@ -7,7 +7,7 @@ Vue.mixin(Outils);
 import axios from "axios";
 
 Vue.prototype.$api = new axios.create({
-    baseURL: "http://api.backoffice.local:62364/",
+    baseURL: "http://docketu.iutnc.univ-lorraine.fr:62364/",
     params: {},
     headers: {}
 });

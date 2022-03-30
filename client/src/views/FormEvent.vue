@@ -47,7 +47,7 @@
                   </div>
                 </div>
                 <div class="field">
-                  <label class="label">Date</label>
+                  <label class="label">Heure</label>
                   <div class="control">
                     <input
                       class="input"
@@ -163,7 +163,6 @@ export default {
           lieu: this.addresse
         })
           .then((response) => {
-            console.log(response.data);
             this.input_description = "";
             this.input_titre = "";
             this.input_time = "";

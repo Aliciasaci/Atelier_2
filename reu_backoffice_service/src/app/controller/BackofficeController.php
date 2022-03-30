@@ -183,11 +183,10 @@ class backofficeController
             'base_uri' => $this->c->get('settings')['events_service'],
             'timeout' => 5.0
         ]);
-
         $response = $client->delete('/events');
-
-        $resp->getBody()->write($response->getBody());
-        return writer::json_output($resp, $response->getStatusCode());
+        $resp = $resp->withStatus($response->getStatusCode())->withHeader('Content-Type', $response->getHeader('Content-Type'))
+            ->withBody($response->getBody());
+        return $resp;
     }
 
 
@@ -414,7 +413,7 @@ class backofficeController
             'timeout' => 5.0
         ]);
 
-        $response = $client->request('GET', '/events/'.$id_event.'/comments/');
+        $response = $client->request('GET', '/events/' . $id_event . '/comments/');
 
         $resp = $resp->withStatus($response->getStatusCode())
             ->withBody($response->getBody());

@@ -18,8 +18,6 @@ export default {
   },
   mounted() {
     this.$store.commit("setReady", true);
-    this.$store.commit("setTokenVisiteur", false);
-
     // si le access token n'est pas présent renvoyer vers la connexion
     if (!this.$store.state.token && !this.$store.state.member.role == 100) {
       this.seConnecter();
@@ -27,10 +25,10 @@ export default {
 
     // si c'est un admin alors renvoyer vers la page Backoffice
     if (!this.$store.state.token && !this.$store.state.member.role == 200) {
-           this.seConnecter();
+      this.seConnecter();
     } else {
-      if(this.$store.state.member.role == 200){
-       this.$router.push("/BackOffice");
+      if (this.$store.state.member.role == 200) {
+        this.$router.push("BackOffice");
       }
     }
 
